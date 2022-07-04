@@ -1,12 +1,12 @@
-from calendar import c
 import re
-from operator import mod
 from module_class import *
 
+marks = ';,=[]'
 PATH = './src/spm.v'
-top_module = 'TCMP'
+top_module = 'spm'
 got_name = False
 # lines = []
+print('')
 
 def read_section_name(curr_line):
     if 'module ' + top_module in curr_line:
@@ -16,22 +16,58 @@ def read_section_name(curr_line):
     else:
         return False
     
-    
 def read_section_params(curr_line):
-    if 'parameter' in curr_line:
-        # print (curr_line)
-        temp_name = curr_line.split()[1:2]         # picking <name>
-        temp_name = temp_name[0]
-        module.param_name.append(temp_name)
-        # print('param_name: ', module.param_name)
+    # print (curr_line)
+    temp = curr_line
 
-        temp_size = curr_line.split()[-1:]         # last word
-        temp_size = temp_size[0][:-1]              # removing ';'
-        module.param_size.append(int(temp_size))        
-        # print('param_size: ', module.param_size)
+    temp = temp.replace('parameter', '')
+
+    for x in temp:
+        if x in marks:
+            temp = temp.replace(x, '')
+
+    temp = temp.split()
+    # print(temp)
+
+    module.param_name.append(temp[0])
+    module.param_value.append(int(temp[1]))  
 
 def read_section_pins(curr_line):
-    print('pin line')
+    temp = curr_line
+
+    if 'input' in temp:      # type detection
+        pin_type = 'input'
+    elif 'output' in temp:
+        pin_type = 'output'
+
+    temp = temp.replace(pin_type, '')
+    print('pin_type=', pin_type)
+
+    if ('[' in temp) or (']' in temp):                    # with parametric size
+
+
+
+
+
+
+
+        
+
+        pass
+    else:                                                 # w/o  parametric size
+        for x in temp:
+            if x in marks:
+                temp = temp.replace(x, '')
+
+        for i in temp.split():
+            if pin_type == 'input':
+                module.input_name.append(i)
+                module.input_size.append(1)
+            elif pin_type == 'output':
+                module.output_name.append(i)
+                module.output_size.append(1)
+
+    print(temp)
 
 
 with open(PATH, 'rt') as file:
@@ -47,28 +83,41 @@ with open(PATH, 'rt') as file:
         if read_section_name(curr_line):
             got_name = True
             continue
+
+        if got_name:
+
+            # if 'parameter' in curr_line:
+            #     read_section_params(curr_line)
+
+            if ('input' in curr_line or 'output' in curr_line):
+                read_section_pins(curr_line)
+
+            if 'endmodule' == curr_line:
+                print('\nEOF found\n')
+                break
+
             
-        if got_name and 'parameter' in curr_line:
-            # print(curr_line)
-            read_section_params(curr_line)
-            if not 'parameter' in curr_line:
-                continue
+        # if got_name and 'parameter' in curr_line:
+        #     # print(curr_line)
+        #     read_section_params(curr_line)
+        #     if not 'parameter' in curr_line:
+        #         continue
 
-        if got_name and ('input' in curr_line or 'output' in curr_line):
-            read_section_pins(curr_line)
-            if not ('input' in curr_line or 'output' in curr_line):
-                    continue
+        # if got_name and ('input' in curr_line or 'output' in curr_line):
+        #     read_section_pins(curr_line)
+        #     if not ('input' in curr_line or 'output' in curr_line):
+        #             continue
 
-        if got_name and curr_line == 'endmodule':
-            print('\nEOF found\n')
-            break
+        # if got_name and curr_line == 'endmodule':
+        #     print('\nEOF found\n')
+        #     break
 
         # if 'module ' + module_name in curr_line:
         #     print (curr_line)
         #     module  = Module(module_name)
         #     print('Created module: ' + module.name)
 
-##################################################################################
+##########################################################################
 
 
         # if 'input'in curr_line:
@@ -98,7 +147,13 @@ with open(PATH, 'rt') as file:
 
 #print(module.pins[0].type)
 
-print('\n\n\n')
+print('\n')
 print('Created module: ' + module.name)
 print('param_name: ', module.param_name)
-print('param_size: ', module.param_size)
+print('param_size: ', module.param_value, end='\n\n')
+
+print('module.inputs.name:', module.input_name)
+print('module.inputs.size:', module.input_size, end='\n\n')
+
+print('module.inputs.name:', module.output_name)
+print('module.inputs.size:', module.output_size, end='\n\n')
