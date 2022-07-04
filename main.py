@@ -30,6 +30,9 @@ def read_section_params(curr_line):
         module.param_size.append(int(temp_size))        
         # print('param_size: ', module.param_size)
 
+def read_section_pins(curr_line):
+    print('pin line')
+
 
 with open(PATH, 'rt') as file:
     module = Module()
@@ -45,20 +48,20 @@ with open(PATH, 'rt') as file:
             got_name = True
             continue
             
-        if got_name:
-            print(curr_line)
+        if got_name and 'parameter' in curr_line:
+            # print(curr_line)
             read_section_params(curr_line)
             if not 'parameter' in curr_line:
-                break
+                continue
 
+        if got_name and ('input' in curr_line or 'output' in curr_line):
+            read_section_pins(curr_line)
+            if not ('input' in curr_line or 'output' in curr_line):
+                    continue
 
-        # if got_name and curr_line != 'endmodule':
-        #     print(curr_line)
-        #     
-        # else:
-        #     break
-
-
+        if got_name and curr_line == 'endmodule':
+            print('\nEOF found\n')
+            break
 
         # if 'module ' + module_name in curr_line:
         #     print (curr_line)
