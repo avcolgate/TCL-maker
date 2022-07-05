@@ -2,28 +2,23 @@ from numpy import NaN
 
 class Module ():
     
-    param_name  = []
-    param_value = []
-
     def __init__(self, name = 'NAN'):
         self.name = name
-        self.input_name  = []
-        self.output_name = []
-        
-        self.input_size  = []
-        self.output_size = []
+        self.params  = []
+        self.inputs  = []
+        self.outputs = []
 
 class Pin:
-    def __init__(self, name, size = 1):
+    def __init__(self, name = 'NAN', size = 1):
         self.name  = name
         self.size  = size
 
         if self.size > 1:
-            self.isBus = True
+            self.type = 'bus'
         else:
-            self.isBus = False
+            self.type = 'wire'
 
 class Param:
-    def __init__(self, name, value):
+    def __init__(self, name = 'NAN', value = 0):
         self.name  = name
         self.value = value
