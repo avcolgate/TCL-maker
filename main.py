@@ -31,132 +31,110 @@ def read_section_pins(curr_line):
     elif 'output' in temp:
         pin_type = 'output'
     temp = temp.replace(pin_type, '').replace('reg', '')
-    print(pin_type)
+    print(pin_type, end=' ')
 
-    new_temp_size = temp[temp.find('['):temp.find(']')+1]
+    temp_size = temp[temp.find('['):temp.find(']')+1]
 
-    print('new_temp_size =' + new_temp_size + '///')
+    # print('temp_size =' + temp_size + '///')
 
+    if (temp_size):                                                   # with parametric size
 
-    if ('[' in temp) or (']' in temp):                                                   # with parametric size
+        temp_name = temp[temp.find(']')+1:]       # copying names only
+        temp_name=re.sub("[;| ]","", temp_name)
+        temp_name_arr = temp_name.split(',')
+        # print('temp_name_arr:', temp_name_arr) # names array
 
-        
-        temp_name  = temp.split(']')[-1]                  # copying names only
-        
-        temp_name = temp_name.replace(';', '')
-        temp_name = temp_name.replace(' ', '')
+        temp_size = re.sub("[\[|\]| ]","", temp_size) # deleting [] and whitespaces
+        temp_size_arr = temp_size.split(':')
+        start_val, end_val = temp_size_arr
+        # print('temp_size_arr:', temp_size_arr)     # sizes array
+        print(temp_name)
 
-        temp_name = temp_name.split(',')
-        # print('split temp_name:', temp_name) # names array
+        if not start_val.isdigit():                             # parameter in LEFT part
 
-        
-        temp_size = temp.split(']')[0].replace('[', '')   # copying sizes only
-        temp_size = temp_size.replace(' ', '')
-
-        temp_size = temp_size.split(':')
-
-        start_val = temp_size[0]     # левая часть
-        end_val   = temp_size[-1]    # правая часть
-        
-        print('start_val, end_val: ', start_val, end_val)
-
-
-
-        if not start_val.isdigit():                             # если ЛЕВАЯ часть содержит параметр
-
-            if '-' in start_val:                      # вычитание
+            if '-' in start_val:                      # substract
                 start_val = start_val.split('-')
-                start_val_left = start_val[0]
-                start_val_right = start_val[-1]
+                start_val_left, start_val_right = start_val
 
-                if not start_val_left.isdigit():                  # если левое число через параметр
-                    val_num = module.param_name.index(start_val_left)
-                    start_val_left = module.param_value[val_num]
+                if not start_val_left.isdigit():                  # parameter in left subpart
+                    val_ind = module.param_name.index(start_val_left)
+                    start_val_left = module.param_value[val_ind]
 
-                if not start_val_right.isdigit():                 # если правое число через параметр
-                    val_num = module.param_name.index(start_val_right)
-                    start_val_right = module.param_value[val_num]
+                if not start_val_right.isdigit():                 # parameter in right subpart
+                    val_ind = module.param_name.index(start_val_right)
+                    start_val_right = module.param_value[val_ind]
 
-                start_val = abs(int(start_val_right) - int(start_val_left))
-                print('(-) start_val = ', start_val)
+                start_val = int(start_val_left) - int(start_val_right)
+                # print('(-) start_val = ', start_val)
 
-            elif '+' in start_val:                    # сложение (???)
+            elif '+' in start_val:                    # add (???)
                 start_val = start_val.split('+')
-                start_val_left = start_val[0]
-                start_val_right = start_val[-1]
+                start_val_left, start_val_right = start_val
 
-                if not start_val_left.isdigit():                  # если левое число через параметр
-                    val_num = module.param_name.index(start_val_left)
-                    start_val_left = module.param_value[val_num]
+                if not start_val_left.isdigit():                  # parameter in left subpart
+                    val_ind = module.param_name.index(start_val_left)
+                    start_val_left = module.param_value[val_ind]
 
-                if not start_val_right.isdigit():                 # если правое число через параметр
-                    val_num = module.param_name.index(start_val_right)
-                    start_val_right = module.param_value[val_num]
+                if not start_val_right.isdigit():                 # parameter in right subpart
+                    val_ind = module.param_name.index(start_val_right)
+                    start_val_right = module.param_value[val_ind]
 
-                start_val = abs(int(start_val[-1]) + int(start_val[0]))
-                print('(+) start_val = ', start_val)
-
+                start_val = int(start_val_left) + int(start_val_right)
+                # print('(+) start_val = ', start_val)
 
 
-        if not end_val.isdigit():                             # если ПРАВАЯ часть содержит параметр
+        if not end_val.isdigit():                               # parameter in RIGHT part
 
-            if '-' in end_val:                      # вычитание
+            if '-' in end_val:                      # substract
                 end_val = end_val.split('-')
-                end_val_left = end_val[0]
-                end_val_right = end_val[-1]
+                end_val_left, end_val_right = end_val
 
-                if not end_val_left.isdigit():                  # если левое число через параметр
-                    val_num = module.param_name.index(end_val_left)
-                    end_val_left = module.param_value[val_num]
+                if not end_val_left.isdigit():                  # parameter in left subpart
+                    val_ind = module.param_name.index(end_val_left)
+                    end_val_left = module.param_value[val_ind]
 
-                if not end_val_right.isdigit():                 # если правое число через параметр
-                    val_num = module.param_name.index(end_val_right)
-                    end_val_right = module.param_value[val_num]
+                if not end_val_right.isdigit():                 # parameter in right subpart
+                    val_ind = module.param_name.index(end_val_right)
+                    end_val_right = module.param_value[val_ind]
 
-                end_val = abs(int(end_val_right) - int(end_val_left))
-                print('(-) end_val = ', end_val)
+                end_val = int(end_val_left) - int(end_val_right)
+                # print('(-) end_val = ', end_val)
 
-            elif '+' in end_val:                    # сложение (???)
+            elif '+' in end_val:                    # add (???)
                 end_val = end_val.split('+')
-                end_val_left = end_val[0]
-                end_val_right = end_val[-1]
+                end_val_left, end_val_right = end_val
 
-                if not end_val_left.isdigit():                  # если левое число через параметр
-                    val_num = module.param_name.index(end_val_left)
-                    end_val_left = module.param_value[val_num]
+                if not end_val_left.isdigit():                  # parameter in left subpart
+                    val_ind = module.param_name.index(end_val_left)
+                    end_val_left = module.param_value[val_ind]
 
-                if not end_val_right.isdigit():                 # если правое число через параметр
-                    val_num = module.param_name.index(end_val_right)
-                    end_val_right = module.param_value[val_num]
+                if not end_val_right.isdigit():                 # parameter in right subpart
+                    val_ind = module.param_name.index(end_val_right)
+                    end_val_right = module.param_value[val_ind]
 
-                end_val = abs(int(end_val[-1]) + int(end_val[0]))
-                print('(+) end = ', end_val)
+                end_val = int(end_val_left) + int(end_val_right)
+                # print('(+) end_val = ', end_val)
 
 
         delta_val = abs(int(end_val) - int(start_val)) + 1
-        print('delta_val = ', delta_val)
+        # print('delta_val = ', delta_val)
 
-        for pin in temp_name:
+        for pin in temp_name_arr:
             module.input_name.append(pin)
             module.input_size.append(delta_val)
 
-       
     else:                                                                                # w/o  parametric size (=1)
-        # for x in temp:
-        #     if x in marks:                          # сделать !!! тест с пробелами
-        #         temp = temp.replace(x, '')
 
-        print(temp)
+        temp_name = re.sub("[;| ]", "", temp)
+        print(temp_name)
 
-        for i in temp.split():
+        for i in temp_name.split(','):
             if pin_type == 'input':
                 module.input_name.append(i)
                 module.input_size.append(1)
             elif pin_type == 'output':
                 module.output_name.append(i)
                 module.output_size.append(1)
-
-    print(temp)
 
 
 with open(PATH, 'rt') as file:
@@ -168,6 +146,10 @@ with open(PATH, 'rt') as file:
     # print(lines)
 
     for curr_line in lines:
+
+        if curr_line.replace(' ', '').find('//') == 0:
+            # print(curr_line + 'ignored')
+            continue
         
         if read_section_name(curr_line):
             got_name = True
@@ -182,18 +164,18 @@ with open(PATH, 'rt') as file:
                 read_section_pins(curr_line)
 
             if 'endmodule' == curr_line:
-                print('\nEOF found\n')
+                print('\nEOF\n')
                 break
 
-# print('\n')
-# print('Created module: ' + module.name)
-# print('param_name: ', module.param_name)
-# print('param_value: ', module.param_value, end='\n\n')
 
-# print('Inputs.name:', module.input_name)
-# print('Inputs.size:', module.input_size, end='\n\n')
+print('Created module: ' + module.name)
+print('param_name: ', module.param_name)
+print('param_value: ', module.param_value, end='\n\n')
 
-# print('Outputs.name:', module.output_name)
-# print('Outputs.size:', module.output_size, end='\n\n')
+print('Inputs.name:', module.input_name)
+print('Inputs.size:', module.input_size, end='\n\n')
+
+print('Outputs.name:', module.output_name)
+print('Outputs.size:', module.output_size, end='\n\n')
 
 print(module)
