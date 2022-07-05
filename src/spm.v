@@ -23,6 +23,7 @@ module TCMP(clk, rst, a, s);
 	parameter TCMP_size1 = 111;
 	parameter TCMP_size2 = 222;
 	parameter TCMP_size3 = 333;
+	parameter TCMP_size4 = 444;
     input clk, rst;
     input a;
     output reg s;
