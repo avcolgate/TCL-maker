@@ -1,9 +1,9 @@
 
 module spm(clk, rst, x, y, p);
-    parameter size = 32;
+    parameter size=32;
     input clk, rst;
     input y;
-    input[size-1:0] x;
+    input[size-1:0] x , z ;
     output p;
 
     wire[size-1:1] pp;
