@@ -1,6 +1,6 @@
 import re
-from module_class import *
-from line_class import *
+from class_module import *
+from class_line import *
 
 def read_section_params(line):
     temp = line.content
