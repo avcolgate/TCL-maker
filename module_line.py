@@ -13,3 +13,19 @@ class Line:
         if 'module' in self.content and str(name) in self.content:
             return True
         return False
+
+    def is_param_section(self):
+        if 'parameter' in self.content:
+            return True
+        return False
+
+    def is_pin_section(self):
+        if 'input' in self.content or 'output' in self.content:
+            return True
+        return False
+
+    def is_endmodule_section(self):
+        if 'endmodule' in self.content:
+            return True
+        return False
+
