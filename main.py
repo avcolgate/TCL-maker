@@ -1,5 +1,5 @@
 from module_class import *
-from module_line import *
+from line_class import *
 from read_func import *
 
 PATH = './src/spm.v'
