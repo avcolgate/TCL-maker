@@ -1,18 +1,9 @@
 import re
 from module_class import *
+from module_line import *
 
-marks = ';,[]='
 PATH = './src/spm.v'
-top_module = 'spm'
-got_name = False
-print('')
-
-def read_section_name(curr_line):
-    if 'module ' + top_module in curr_line:
-        module.name = top_module
-        return True
-    else:
-        return False
+top_module_name = 'spm'
     
 def read_section_params(curr_line):
     temp = curr_line.replace('parameter', '')
@@ -22,7 +13,6 @@ def read_section_params(curr_line):
 
     parameter = Param(temp_name, int(temp_size))
     module.params.append(parameter)
-
 
 def read_section_pins(curr_line):
     temp = curr_line
@@ -55,14 +45,14 @@ def read_section_pins(curr_line):
                 start_val_left, start_val_right = start_val
 
                 if not start_val_left.isdigit():                  # parameter in left subpart
-                    for i in module.params:
-                        if i.name == start_val_left:
-                            start_val_left = i.value
+                    for param in module.params:
+                        if param.name == start_val_left:
+                            start_val_left = param.value
 
                 if not start_val_right.isdigit():                 # parameter in right subpart
-                    for i in module.params:
-                        if i.name == start_val_right:
-                            start_val_right = i.value
+                    for param in module.params:
+                        if param.name == start_val_right:
+                            start_val_right = param.value
 
                 start_val = int(start_val_left) - int(start_val_right)
 
@@ -71,14 +61,14 @@ def read_section_pins(curr_line):
                 start_val_left, start_val_right = start_val
 
                 if not start_val_left.isdigit():                  # parameter in left subpart
-                    for i in module.params:
-                        if i.name == start_val_left:
-                            start_val_left = i.value
+                    for param in module.params:
+                        if param.name == start_val_left:
+                            start_val_left = param.value
 
                 if not start_val_right.isdigit():                 # parameter in right subpart
-                    for i in module.params:
-                        if i.name == start_val_right:
-                            start_val_right = i.value
+                    for param in module.params:
+                        if param.name == start_val_right:
+                            start_val_right = param.value
 
                 start_val = int(start_val_left) + int(start_val_right)
 
@@ -90,14 +80,14 @@ def read_section_pins(curr_line):
                 end_val_left, end_val_right = end_val
 
                 if not end_val_left.isdigit():                  # parameter in left subpart
-                    for i in module.params:
-                        if i.name == end_val_left:
-                            end_val_left = i.value
+                    for param in module.params:
+                        if param.name == end_val_left:
+                            end_val_left = param.value
 
                 if not end_val_right.isdigit():                 # parameter in right subpart
-                    for i in module.params:
-                        if i.name == end_val_right:
-                            end_val_right = i.value
+                    for param in module.params:
+                        if param.name == end_val_right:
+                            end_val_right = param.value
 
                 end_val = int(end_val_left) - int(end_val_right)
                 
@@ -106,14 +96,14 @@ def read_section_pins(curr_line):
                 end_val_left, end_val_right = end_val
 
                 if not end_val_left.isdigit():                  # parameter in left subpart
-                    for i in module.params:
-                        if i.name == end_val_left:
-                            end_val_left = i.value
+                    for param in module.params:
+                        if param.name == end_val_left:
+                            end_val_left = param.value
 
                 if not end_val_right.isdigit():                 # parameter in right subpart
-                    for i in module.params:
-                        if i.name == end_val_right:
-                            end_val_right = i.value
+                    for param in module.params:
+                        if param.name == end_val_right:
+                            end_val_right = param.value
 
                 end_val = int(end_val_left) + int(end_val_right)
                 
@@ -144,47 +134,29 @@ def read_section_pins(curr_line):
 
 with open(PATH, 'rt') as file:
     module = Module()
-    text = file.read()
 
-    lines=text.split('\n')
-
-    # print(lines)
+    lines = file.read().split('\n')
 
     for curr_line in lines:
 
-        if curr_line.replace(' ', '').find('//') == 0:
+        line = Line(curr_line)
+
+        if line.is_comment():
             continue
         
-        if read_section_name(curr_line):
-            got_name = True
+        if line.is_name_section(top_module_name):
+            module.append_name(top_module_name)
             continue
 
-        if got_name:
+        if module.name:
 
-            if 'parameter' in curr_line:
-                read_section_params(curr_line)
+            if 'parameter' in line.content:
+                read_section_params(line.content)
 
-            if ('input' in curr_line or 'output' in curr_line):
-                read_section_pins(curr_line)
+            if ('input' in line.content or 'output' in line.content):
+                read_section_pins(line.content)
 
-            if 'endmodule' == curr_line:
+            if 'endmodule' == line.content:
                 break
 
-
-print('# Name')
-print(module.name)
-
-if len(module.params):
-    print('# Parameters')
-for i in module.params:
-    print('%s: %i' % (i.name, i.value))
-
-if len(module.inputs):
-    print('# Inputs')
-for i in module.inputs:
-    print('%4s: %2i (%s)' % (i.name, i.size, i.type))
-
-if len(module.outputs):
-    print('# Outputs')
-for i in module.outputs:
-    print('%4s: %2i (%s)' % (i.name, i.size, i.type))
+module.print()
