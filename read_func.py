@@ -2,6 +2,12 @@ import re
 from class_module import *
 from class_line import *
 
+def read_section_name(line):
+    temp = line.content
+    name = temp[temp.find('module')+len('module')+1:temp.find('(')]
+
+    return name
+
 def read_section_params(line):
     temp = line.content
     temp = temp.replace('parameter', '')

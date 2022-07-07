@@ -10,7 +10,7 @@ class Line:
         return False
 
     def is_name_section(self, name):
-        if 'module' in self.content and str(name) in self.content:
+        if 'module ' + str(name) in self.content:
             return True
         return False
 
