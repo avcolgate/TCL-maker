@@ -1,13 +1,17 @@
+import sys
+
 from class_module import *
 from class_line import *
 from read_func import *
 
-PATH = './src/spm.v'
-top_module_name = 'spm'
-
 def main():
-    with open(PATH, 'rt') as file:
-        module = Module()
+    if len(sys.argv) < 2:
+        return
+    
+    top_module_name = sys.argv[1][sys.argv[1].rfind('/')+1:sys.argv[1].rfind('.')]
+
+    with open(file = sys.argv[1], mode='rt') as file:
+        module = Module()   
 
         for curr_line in file.read().split('\n'):
 
