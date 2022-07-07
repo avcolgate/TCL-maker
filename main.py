@@ -6,6 +6,7 @@ from read_func import *
 
 def main():
     if len(sys.argv) < 2:
+        print('No path!')
         return
     
     top_module_name = sys.argv[1][sys.argv[1].rfind('/')+1:sys.argv[1].rfind('.')]
