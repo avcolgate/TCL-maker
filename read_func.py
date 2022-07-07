@@ -4,12 +4,19 @@ from class_line import *
 
 def read_section_name(line):
     temp = line.content
-    name = temp[temp.find('module')+len('module')+1:temp.find('(')]
+    if temp.find('(') != -1:                                                  # '(' exist
+        name = temp[temp.find('module')+len('module')+1:temp.find('(')]
+    else:                                                                     # '(' don't exist
+        name = temp[temp.find('module')+len('module')+1:]
 
     return name
 
 def read_section_params(line):
-    temp = line.content
+    if '//' in line.content:                              #TODO make better
+        temp = line.content[:line.content.find('//')]
+    else:
+        temp = line.content
+
     temp = temp.replace('parameter', '')
     temp = re.sub("[;| |\t]","", temp)
     temp_name, temp_size = temp.split('=')
@@ -18,9 +25,13 @@ def read_section_params(line):
     return param
 
 def read_section_pins(line, param_list):
-    temp = line.content
     pin_arr = []
-
+    
+    if '//' in line.content:                              #TODO make better
+        temp = line.content[:line.content.find('//')]
+    else:
+        temp = line.content
+        
     if 'input' in temp:      # detection of direction 
         pin_direction = 'input'
     elif 'output' in temp:
@@ -33,8 +44,9 @@ def read_section_pins(line, param_list):
     if (temp_size):                                            # * parametric size
 
         temp_name = temp[temp.find(']')+1:]       # copying names only
-        temp_name=re.sub("[;| |\t]","", temp_name)
+        temp_name=re.sub("[;| |\t]", "", temp_name)
         temp_name_arr = temp_name.split(',')
+        temp_name_arr = list(filter(None, temp_name_arr)) # deleting '' names
         # print('temp_name_arr:', temp_name_arr) # names array
 
         temp_size = re.sub("[\[|\]| |\t]","", temp_size) # deleting [] and whitespaces
@@ -122,6 +134,7 @@ def read_section_pins(line, param_list):
 
         temp_name = re.sub("[;| |\t]", "", temp)
         temp_name_arr = temp_name.split(',')
+        temp_name_arr = list(filter(None, temp_name_arr)) # deleting '' names
         # print(temp_name_arr)
 
         for pin_name in temp_name_arr:

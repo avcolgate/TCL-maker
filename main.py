@@ -1,4 +1,11 @@
+
+# *    argv[1] is source name
+# *
+# * if argv[2] exists => using it as a name of top module
+# *
+
 import sys
+import os.path
 
 from class_module import *
 from class_line import *
@@ -8,8 +15,15 @@ def main():
     if len(sys.argv) < 2:
         print('No path!')
         return
+
+    if not os.path.exists(sys.argv[1]):
+        print('No file!')
+        return
     
-    top_module_name = sys.argv[1][sys.argv[1].rfind('/')+1:sys.argv[1].rfind('.')]
+    if len(sys.argv) > 2:
+        top_module_name = sys.argv[2]
+    else:
+        top_module_name = sys.argv[1][sys.argv[1].rfind('/')+1:sys.argv[1].rfind('.')]
 
     with open(file = sys.argv[1], mode='rt') as file:
         module = Module()   

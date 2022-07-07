@@ -6,7 +6,11 @@ class Module:
         self.outputs = []
 
     def print(self):
-        print(self.name)
+        if self.name == '':
+            print('Not found')
+            return
+        else:
+            print(self.name)
 
         if len(self.params):
             print('# Parameters')
