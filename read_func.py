@@ -60,72 +60,51 @@ def read_section_pins(line, param_list):
 
         if not start_val.isdigit():                             # if parameter in LEFT part
 
-            if '-' in start_val:                      # substract
+            if '-' in start_val:
                 start_val = start_val.split('-')
-                start_val_left, start_val_right = start_val
-
-                if not start_val_left.isdigit():                  # parameter in left subpart
-                    for param in param_list:
-                        if param.name == start_val_left:
-                            start_val_left = param.value
-
-                if not start_val_right.isdigit():                 # parameter in right subpart
-                    for param in param_list:
-                        if param.name == start_val_right:
-                            start_val_right = param.value
-
-                start_val = int(start_val_left) - int(start_val_right)
-
-            elif '+' in start_val:                    # add (???)
+                k = -1
+            
+            elif '+' in start_val:
                 start_val = start_val.split('+')
-                start_val_left, start_val_right = start_val
+                k = 1
 
-                if not start_val_left.isdigit():                  # parameter in left subpart
-                    for param in param_list:
-                        if param.name == start_val_left:
-                            start_val_left = param.value
+            start_val_left, start_val_right = start_val
 
-                if not start_val_right.isdigit():                 # parameter in right subpart
-                    for param in param_list:
-                        if param.name == start_val_right:
-                            start_val_right = param.value
+            if not start_val_left.isdigit():                  # parameter in left subpart
+                for param in param_list:
+                    if param.name == start_val_left:
+                        start_val_left = param.value
 
-                start_val = int(start_val_left) + int(start_val_right)
+            if not start_val_right.isdigit():                 # parameter in right subpart
+                for param in param_list:
+                    if param.name == start_val_right:
+                        start_val_right = param.value
 
+            start_val = int(start_val_left) + int(start_val_right)*k
 
         if not end_val.isdigit():                               # if parameter in RIGHT part
 
-            if '-' in end_val:                        # substract
+            if '-' in end_val:
                 end_val = end_val.split('-')
-                end_val_left, end_val_right = end_val
+                k = -1
 
-                if not end_val_left.isdigit():                  # parameter in left subpart
-                    for param in param_list:
-                        if param.name == end_val_left:
-                            end_val_left = param.value
-
-                if not end_val_right.isdigit():                 # parameter in right subpart
-                    for param in param_list:
-                        if param.name == end_val_right:
-                            end_val_right = param.value
-
-                end_val = int(end_val_left) - int(end_val_right)
-                
-            elif '+' in end_val:                      # add (???)
+            elif '+' in end_val:
                 end_val = end_val.split('+')
-                end_val_left, end_val_right = end_val
+                k = 1
 
-                if not end_val_left.isdigit():                  # parameter in left subpart
-                    for param in param_list:
-                        if param.name == end_val_left:
-                            end_val_left = param.value
+            end_val_left, end_val_right = end_val
 
-                if not end_val_right.isdigit():                 # parameter in right subpart
-                    for param in param_list:
-                        if param.name == end_val_right:
-                            end_val_right = param.value
+            if not end_val_left.isdigit():                  # parameter in left subpart
+                for param in param_list:
+                    if param.name == end_val_left:
+                        end_val_left = param.value
 
-                end_val = int(end_val_left) + int(end_val_right)
+            if not end_val_right.isdigit():                 # parameter in right subpart
+                for param in param_list:
+                    if param.name == end_val_right:
+                        end_val_right = param.value
+
+            end_val = int(end_val_left) + int(end_val_right)*k
                 
 
         delta_val = abs(int(end_val) - int(start_val)) + 1
