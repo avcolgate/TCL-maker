@@ -1,7 +1,4 @@
-from ast import Mod
 import re
-
-from discord import Attachment
 from class_module import *
 from class_line import *
 
@@ -21,7 +18,7 @@ def read_section_params(line):
         temp = line.content
 
     temp = temp.replace('parameter', '')
-    temp = re.sub("[;| |\t]","", temp)
+    temp = re.sub("[;| |\t|,]","", temp)
     temp_name, temp_size = temp.split('=')
 
     param = Param(temp_name, int(temp_size))
@@ -40,7 +37,9 @@ def read_section_pins(line, param_list):
         pin_direction = 'input'
     elif 'output' in temp:
         pin_direction = 'output'
-    temp = temp.replace(pin_direction, '').replace('reg', '')  # ? ignore 'reg'?
+    temp = temp.replace(pin_direction, '').replace('reg', '')  # ? ignore   'reg'?
+    temp = temp.replace(pin_direction, '').replace('wire', '')  # ? ignore  'wire'?
+    temp = temp.replace(pin_direction, '').replace('logic', '')  # ? ignore 'logic'?
     # print(pin_direction, end=' ')
 
     temp_size = temp[temp.find('['):temp.find(']')+1]
@@ -138,6 +137,8 @@ def get_module_name(lines):
             else:
                 name = line[line.find('module')+len('module')+1:]
             names.append(name)
+    if not names:
+        return
 
     for module_name in names:
         module_lines = []

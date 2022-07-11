@@ -21,12 +21,12 @@ class Module:
         if len(self.inputs):
             print('# Inputs')
         for input in self.inputs:
-            print('%4s: %2i (%s)' % (input.name, input.size, input.type))
+            print('%8s: %2i (%s)' % (input.name, input.size, input.type))
 
         if len(self.outputs):
             print('# Outputs')
         for output in self.outputs:
-            print('%4s: %2i (%s)' % (output.name, output.size, output.type))
+            print('%8s: %2i (%s)' % (output.name, output.size, output.type))
 
     def append_name(self, name):
         self.name = name
