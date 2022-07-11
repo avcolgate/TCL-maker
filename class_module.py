@@ -1,9 +1,10 @@
 class Module:
     def __init__(self, name = ''):
         self.name = name
-        self.params  = []
-        self.inputs  = []
-        self.outputs = []
+        self.params      = []
+        self.inputs      = []
+        self.outputs     = []
+        self.called      = False
 
     def print(self):
         if self.name == '':
@@ -30,7 +31,7 @@ class Module:
     def append_name(self, name):
         self.name = name
 
-    def append_param(self, param):
+    def append_params(self, param):
         self.params.append(param)
 
     def append_pin(self, pin):

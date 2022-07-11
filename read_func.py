@@ -1,8 +1,11 @@
+from ast import Mod
 import re
+
+from discord import Attachment
 from class_module import *
 from class_line import *
 
-def read_section_name(line):
+def read_section_name(line):                      # ? delete??
     temp = line.content
     if temp.find('(') != -1:                                                  # '(' exist
         name = temp[temp.find('module')+len('module')+1:temp.find('(')]
@@ -12,7 +15,7 @@ def read_section_name(line):
     return name
 
 def read_section_params(line):
-    if '//' in line.content:                              #TODO make better
+    if '//' in line.content:
         temp = line.content[:line.content.find('//')]
     else:
         temp = line.content
@@ -22,12 +25,13 @@ def read_section_params(line):
     temp_name, temp_size = temp.split('=')
 
     param = Param(temp_name, int(temp_size))
+
     return param
 
 def read_section_pins(line, param_list):
     pin_arr = []
-    
-    if '//' in line.content:                              #TODO make better
+
+    if '//' in line.content:
         temp = line.content[:line.content.find('//')]
     else:
         temp = line.content
@@ -142,3 +146,56 @@ def read_section_pins(line, param_list):
             pin_arr.append(pin)
 
     return pin_arr
+
+def get_module_name(lines):
+    names            = []
+    module_list      = []
+    attachments_list = []
+
+    for line in lines:
+        if 'module ' in line:
+            if line.find('(') != -1:
+                name = line[line.find('module')+len('module')+1:line.find('(')]
+            else:
+                name = line[line.find('module')+len('module')+1:]
+            names.append(name)
+
+    for module_name in names:
+        module_lines = []
+        is_module_section = False
+        module = Module(module_name)
+        for line in lines:
+            if 'module ' + module.name in line:               # found start point of section
+                is_module_section = True
+                continue
+            elif is_module_section and 'endmodule' in line:   # found end point of section
+                is_module_section = False
+                continue
+            elif is_module_section:
+                if '//' in line:
+                    line = line[:line.find('//')]
+                line = re.sub("[\t]", "", line)
+                line = line.replace('  ', '')
+                module_lines.append(line)
+
+        module_lines = list(filter(None, module_lines))       # deleting '' names
+
+        for att in names:
+            for line in module_lines:
+                if att in line and att != module.name and att not in attachments_list:
+                    # print(line)
+                    attachments_list.append(att)
+        
+        module_list.append(module)
+
+    for mod in module_list:
+        for att in attachments_list:
+            if mod.name == att:
+                mod.called = True
+
+    for mod in module_list:
+        if mod.called == False:
+            module_name = mod.name
+            break
+
+    return module_name

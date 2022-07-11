@@ -1,9 +1,3 @@
-
-# *    argv[1] is source name
-# *
-# * if argv[2] exists => using it as a name of top module
-# *
-
 import sys
 import os.path
 
@@ -16,26 +10,25 @@ def main():
         print('No path!')
         return
 
-    if not os.path.exists(sys.argv[1]):
-        print('No file!')
-        return
-    
-    if len(sys.argv) > 2:
-        top_module_name = sys.argv[2]
+    if os.path.exists(sys.argv[1]):
+        PATH = sys.argv[1].replace('\\', '/')
     else:
-        top_module_name = sys.argv[1][sys.argv[1].rfind('/')+1:sys.argv[1].rfind('.')]
+        print('No input file!')
+        return
 
-    with open(file = sys.argv[1], mode='rt') as file:
-        module = Module()   
+    with open(file = PATH, mode='rt') as file:
+        module = Module()
+        lines = file.read().split('\n')
 
-        for curr_line in file.read().split('\n'):
+        module_name = get_module_name(lines)                #TODO предусмотреть ошибки
 
+        for curr_line in lines:
             line = Line(curr_line)
 
             if line.is_comment():
                 continue
             
-            if line.is_name_section(top_module_name):
+            if line.is_name_section(module_name):
                 name = read_section_name(line)
                 module.append_name(name)
                 continue
@@ -43,7 +36,7 @@ def main():
             if module.name:
                 if line.is_param_section():
                     param = read_section_params(line)
-                    module.append_param(param)
+                    module.append_params(param)
 
                 if line.is_pin_section():
                     pin_arr = read_section_pins(line, module.params)
