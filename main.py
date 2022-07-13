@@ -1,9 +1,8 @@
-import sys
 import os.path
+import sys
 
-from class_module import *
-from class_line import *
 from read_func import *
+
 
 def main():
     if len(sys.argv) < 2:
@@ -11,16 +10,16 @@ def main():
         return
 
     if os.path.exists(sys.argv[1]):
-        PATH = sys.argv[1].replace('\\', '/')
+        path = sys.argv[1].replace('\\', '/')
     else:
         print('No input file!')
         return
 
-    with open(file = PATH, mode='rt') as file:
+    with open(file=path, mode='rt') as file:
         module = Module()
         lines = file.read().split('\n')
-
-        module_name = get_module_name(lines)                #TODO предусмотреть ошибки
+        lines = list(filter(None, lines))  # deleting '' lines
+        module_name = get_module_name(lines)
 
         for curr_line in lines:
             line = Line(curr_line)
@@ -47,6 +46,7 @@ def main():
                     break
 
         module.print()
+
 
 if __name__ == "__main__":
     main()

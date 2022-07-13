@@ -1,10 +1,10 @@
 class Module:
-    def __init__(self, name = ''):
+    def __init__(self, name=''):
         self.name = name
-        self.params      = []
-        self.inputs      = []
-        self.outputs     = []
-        self.called      = False
+        self.params = []
+        self.inputs = []
+        self.outputs = []
+        self.called = False
 
     def print(self):
         if self.name == '':
@@ -13,20 +13,20 @@ class Module:
         else:
             print(self.name)
 
-        if len(self.params):
-            print('# Parameters')
-        for param in self.params:
-            print('%s: %i' % (param.name, param.value))
+        # if len(self.params):
+        #     print('# Parameters')
+        # for param in self.params:
+        #     print('%s: %i' % (param.name, param.value))
 
         if len(self.inputs):
             print('# Inputs')
-        for input in self.inputs:
-            print('%8s: %2i (%s)' % (input.name, input.size, input.type))
+        for pin in self.inputs:
+            print('%8s: %2i (%s)' % (pin.name, pin.size, pin.type))
 
         if len(self.outputs):
             print('# Outputs')
-        for output in self.outputs:
-            print('%8s: %2i (%s)' % (output.name, output.size, output.type))
+        for pin in self.outputs:
+            print('%8s: %2i (%s)' % (pin.name, pin.size, pin.type))
 
     def append_name(self, name):
         self.name = name
@@ -40,8 +40,9 @@ class Module:
         if pin.direction == 'output':
             self.outputs.append(pin)
 
+
 class Pin:
-    def __init__(self, name = '', direction = '', size = 1):
+    def __init__(self, name='', direction='', size=1):
         self.name = name
         self.direction = direction
         self.size = size
@@ -51,7 +52,8 @@ class Pin:
         else:
             self.type = 'wire'
 
+
 class Param:
-    def __init__(self, name = '', value = 0):
-        self.name  = name
+    def __init__(self, name='', value=0):
+        self.name = name
         self.value = value
