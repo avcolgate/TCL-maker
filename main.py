@@ -34,7 +34,7 @@ def main():
 
             if module.name:
                 if line.is_param_section():
-                    param = read_section_params(line)
+                    param = read_section_params(line, module.params)
                     module.append_params(param)
 
                 if line.is_pin_section():

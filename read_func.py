@@ -1,3 +1,4 @@
+from tempfile import tempdir
 from class_module import *
 from class_line import *
 
@@ -12,7 +13,9 @@ def read_section_name(line):  # ? delete??
     return name
 
 
-def read_section_params(line):
+def read_section_params(line, param_list):
+    param = Param()
+
     if '//' in line.content:
         temp = line.content[:line.content.find('//')]
     else:
@@ -20,9 +23,105 @@ def read_section_params(line):
 
     temp = temp.replace('parameter', '')
     temp = re.sub("[;| |\t|,]", "", temp)
+    
     temp_name, temp_size = temp.split('=')
 
-    param = Param(temp_name, int(temp_size))
+    # * parametric size of parameter
+    if not temp_size.isdigit():
+        temp_value = temp_size
+
+        if '<<' in temp_value:
+            val_left, val_right = temp_value.split('<<')
+
+            if not val_left.isdigit():
+                for par in param_list:
+                    if val_left == par.name:
+                        val_left = par.value
+
+            if not val_right.isdigit():
+                for par in param_list:
+                    if val_right == par.name:
+                        val_right = par.value
+
+            temp_size = int(val_left) << int(val_right)
+
+        if '>>' in temp_value:
+            val_left, val_right = temp_value.split('>>')
+
+            if not val_left.isdigit():
+                for par in param_list:
+                    if val_left == par.name:
+                        val_left = par.value
+
+            if not val_right.isdigit():
+                for par in param_list:
+                    if val_right == par.name:
+                        val_right = par.value
+
+            temp_size = int(val_left) >> int(val_right)
+
+        if '+' in temp_value:
+            val_left, val_right = temp_value.split('+')
+
+            if not val_left.isdigit():
+                for par in param_list:
+                    if val_left == par.name:
+                        val_left = par.value
+
+            if not val_right.isdigit():
+                for par in param_list:
+                    if val_right == par.name:
+                        val_right = par.value
+
+            temp_size = int(val_left) + int(val_right)
+
+        if '-' in temp_value:
+            val_left, val_right = temp_value.split('-')
+
+            if not val_left.isdigit():
+                for par in param_list:
+                    if val_left == par.name:
+                        val_left = par.value
+
+            if not val_right.isdigit():
+                for par in param_list:
+                    if val_right == par.name:
+                        val_right = par.value
+
+            temp_size = int(val_left) - int(val_right)
+
+        if '*' in temp_value:
+            val_left, val_right = temp_value.split('*')
+
+            if not val_left.isdigit():
+                for par in param_list:
+                    if val_left == par.name:
+                        val_left = par.value
+
+            if not val_right.isdigit():
+                for par in param_list:
+                    if val_right == par.name:
+                        val_right = par.value
+
+            temp_size = int(val_left) * int(val_right)
+
+        if '/' in temp_value:
+            val_left, val_right = temp_value.split('/')
+
+            if not val_left.isdigit():
+                for par in param_list:
+                    if val_left == par.name:
+                        val_left = par.value
+
+            if not val_right.isdigit():
+                for par in param_list:
+                    if val_right == par.name:
+                        val_right = par.value
+
+            temp_size = int(val_left) / int(val_right)
+    
+    param.name =  temp_name
+    param.value = int(temp_size)
 
     return param
 

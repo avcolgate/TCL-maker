@@ -13,10 +13,10 @@ class Module:
         else:
             print(self.name)
 
-        # if len(self.params):
-        #     print('# Parameters')
-        # for param in self.params:
-        #     print('%s: %i' % (param.name, param.value))
+        if len(self.params):
+            print('# Parameters')
+        for param in self.params:
+            print('%s: %i' % (param.name, param.value))
 
         if len(self.inputs):
             print('# Inputs')
