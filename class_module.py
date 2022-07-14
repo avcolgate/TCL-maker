@@ -4,6 +4,7 @@ class Module:
         self.params = []
         self.inputs = []
         self.outputs = []
+        self.inouts = []
         self.called = False
 
     def print(self):
@@ -13,19 +14,24 @@ class Module:
         else:
             print(self.name)
 
-        if len(self.params):
-            print('# Parameters')
-        for param in self.params:
-            print('%s: %i' % (param.name, param.value))
+        # if len(self.params):
+        #     print('# Parameters')
+        # for param in self.params:
+        #     print('%s: %i' % (param.name, param.value))
 
         if len(self.inputs):
-            print('# Inputs')
+            print('# Inputs [%i]' % len(self.inputs))
         for pin in self.inputs:
             print('%8s: %2i (%s)' % (pin.name, pin.size, pin.type))
 
         if len(self.outputs):
-            print('# Outputs')
+            print('# Outputs [%i]' % len(self.outputs))
         for pin in self.outputs:
+            print('%8s: %2i (%s)' % (pin.name, pin.size, pin.type))
+
+        if len(self.inouts):
+            print('# Inouts [%i]' % len(self.inouts))
+        for pin in self.inouts:
             print('%8s: %2i (%s)' % (pin.name, pin.size, pin.type))
 
     def append_name(self, name):
@@ -37,8 +43,12 @@ class Module:
     def append_pin(self, pin):
         if pin.direction == 'input':
             self.inputs.append(pin)
-        if pin.direction == 'output':
+        elif pin.direction == 'output':
             self.outputs.append(pin)
+        elif pin.direction == 'inout':
+            self.inouts.append(pin)
+        else:
+            print('fatal: wrong type of pin %s' % pin.name)
 
 
 class Pin:

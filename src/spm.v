@@ -1,7 +1,7 @@
 
 module spm(clk, rst, x, y, p);
     parameter size = 32;
-	parameter size_right = size >> 1;
+	parameter size_right = size ^ 1;
 	parameter size_left = size << 1;
 	parameter size_plus = size + 1;
 	parameter size_minus = size - 1;
@@ -10,8 +10,9 @@ module spm(clk, rst, x, y, p);
 	
     input clk, rst;
     input y;
-    input[size-1:0] x;
+    input[size-1:0] x, q;
     output p;
+	inout io;
 
     wire[size-1:1] pp;
     wire[size-1:0] xy;

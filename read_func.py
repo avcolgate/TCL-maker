@@ -1,4 +1,3 @@
-from tempfile import tempdir
 from class_module import *
 from class_line import *
 
@@ -45,7 +44,7 @@ def read_section_params(line, param_list):
 
             temp_size = int(val_left) << int(val_right)
 
-        if '>>' in temp_value:
+        elif '>>' in temp_value:
             val_left, val_right = temp_value.split('>>')
 
             if not val_left.isdigit():
@@ -60,7 +59,7 @@ def read_section_params(line, param_list):
 
             temp_size = int(val_left) >> int(val_right)
 
-        if '+' in temp_value:
+        elif '+' in temp_value:
             val_left, val_right = temp_value.split('+')
 
             if not val_left.isdigit():
@@ -75,7 +74,7 @@ def read_section_params(line, param_list):
 
             temp_size = int(val_left) + int(val_right)
 
-        if '-' in temp_value:
+        elif '-' in temp_value:
             val_left, val_right = temp_value.split('-')
 
             if not val_left.isdigit():
@@ -90,7 +89,7 @@ def read_section_params(line, param_list):
 
             temp_size = int(val_left) - int(val_right)
 
-        if '*' in temp_value:
+        elif '*' in temp_value:
             val_left, val_right = temp_value.split('*')
 
             if not val_left.isdigit():
@@ -105,7 +104,7 @@ def read_section_params(line, param_list):
 
             temp_size = int(val_left) * int(val_right)
 
-        if '/' in temp_value:
+        elif '/' in temp_value:
             val_left, val_right = temp_value.split('/')
 
             if not val_left.isdigit():
@@ -119,6 +118,12 @@ def read_section_params(line, param_list):
                         val_right = par.value
 
             temp_size = int(val_left) / int(val_right)
+
+        else:
+            param.name = '! unsupported expr'
+            param.value = 0
+            return param
+            
     
     param.name =  temp_name
     param.value = int(temp_size)
@@ -132,32 +137,36 @@ def read_section_pins(line, param_list):
     k = 1
 
     if '//' in line.content:
-        temp = line.content[:line.content.find('//')]
+        temp = line.content[:line.content.find('//')].strip()
     else:
-        temp = line.content
+        temp = line.content.strip()
 
-    if 'input' in temp:  # detection of direction
-        pin_direction = 'input'
-    elif 'output' in temp:
-        pin_direction = 'output'
+    temp_direction_name = re.sub(r'\[[^()]*\]', '', temp) # substracting size
+
+    pin_direction = temp_direction_name[:temp_direction_name.find(' ')] # input | output | inout
+
+    pin_size = temp[temp.find('['):temp.find(']') + 1] # [...]
+
+    temp_name = temp_direction_name.replace(pin_direction, '')
+    temp_name = re.sub("[;| |\t]", "", temp_name) # name1,name2,..
+    temp_name_arr = temp_name.split(',')
+    temp_name_arr = list(filter(None, temp_name_arr))  # deleting '' names
+    # print('temp_name_arr:', temp_name_arr) # names array
+
+    if not (pin_direction == 'input' or pin_direction == 'output' or pin_direction == 'inout'):
+        print('fatal: wrong type of pin %s' %temp_name)
+        exit()
+
     temp = temp.replace(pin_direction, '').replace('reg', '')  # ? ignore   'reg'?
     temp = temp.replace(pin_direction, '').replace('wire', '')  # ? ignore  'wire'?
     temp = temp.replace(pin_direction, '').replace('logic', '')  # ? ignore 'logic'?
     # print(pin_direction, end=' ')
 
-    temp_size = temp[temp.find('['):temp.find(']') + 1]
-
     # * parametric size
-    if temp_size:
+    if pin_size:
 
-        temp_name = temp[temp.find(']') + 1:]  # copying names only
-        temp_name = re.sub("[;| |\t]", "", temp_name)
-        temp_name_arr = temp_name.split(',')
-        temp_name_arr = list(filter(None, temp_name_arr))  # deleting '' names
-        # print('temp_name_arr:', temp_name_arr) # names array
-
-        temp_size = re.sub("[\[|\]| |\t]", "", temp_size)  # deleting [] and whitespaces
-        temp_size_arr = temp_size.split(':')
+        pin_size = re.sub("[\[|\]| |\t]", "", pin_size)  # deleting [] and whitespaces
+        temp_size_arr = pin_size.split(':')
         start_val, end_val = temp_size_arr
         # print('temp_size_arr:', temp_size_arr) # sizes array
 
@@ -209,23 +218,15 @@ def read_section_pins(line, param_list):
 
             end_val = int(end_val_left) + int(end_val_right) * k
 
-        delta_val = abs(int(end_val) - int(start_val)) + 1
-
-        for pin_name in temp_name_arr:
-            pin = Pin(pin_name, pin_direction, int(delta_val))
-            pin_arr.append(pin)
+        pin_true_size = abs(int(end_val) - int(start_val)) + 1
 
     # * simple size (=1)
     else:
+        pin_true_size = 1
 
-        temp_name = re.sub("[;| |\t]", "", temp)
-        temp_name_arr = temp_name.split(',')
-        temp_name_arr = list(filter(None, temp_name_arr))  # deleting '' names
-        # print(temp_name_arr)
-
-        for pin_name in temp_name_arr:
-            pin = Pin(pin_name, pin_direction, 1)
-            pin_arr.append(pin)
+    for pin_name in temp_name_arr:
+        pin = Pin(pin_name, pin_direction, pin_true_size)
+        pin_arr.append(pin)
 
     return pin_arr
 

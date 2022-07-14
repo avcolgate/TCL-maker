@@ -21,7 +21,7 @@ class Line:
         return False
 
     def is_pin_section(self):
-        if 'input' in self.content or 'output' in self.content:
+        if 'input' in self.content or 'output' in self.content or 'inout' in self.content:
             return True
         return False
 
