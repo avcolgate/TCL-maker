@@ -1,3 +1,4 @@
+from numpy import count_nonzero
 from class_module import *
 from class_line import *
 
@@ -12,6 +13,9 @@ def read_section_name(line):  # ? delete??
     return name
 
 
+# * fatals: 
+# bad expression in size
+# duplicate name
 def read_section_params(line, param_list):
     param = Param()
 
@@ -23,14 +27,18 @@ def read_section_params(line, param_list):
     temp = temp.replace('parameter', '')
     temp = re.sub("[;| |\t|,]", "", temp)
     
-    temp_name, temp_size = temp.split('=')
+    temp_name, temp_expr = temp.split('=')
+
+    for par in param_list:
+        if par.name == temp_name:
+            print('fatal: duplicate parameter %s, line %i' % (temp_name, 1)) #TODO line number
+            exit()
 
     # * parametric size of parameter
-    if not temp_size.isdigit():
-        temp_value = temp_size
+    if not temp_expr.isdigit():
 
-        if '<<' in temp_value:
-            val_left, val_right = temp_value.split('<<')
+        if '<<' in temp_expr:
+            val_left, val_right = temp_expr.split('<<')
 
             if not val_left.isdigit():
                 for par in param_list:
@@ -44,8 +52,8 @@ def read_section_params(line, param_list):
 
             temp_size = int(val_left) << int(val_right)
 
-        elif '>>' in temp_value:
-            val_left, val_right = temp_value.split('>>')
+        elif '>>' in temp_expr:
+            val_left, val_right = temp_expr.split('>>')
 
             if not val_left.isdigit():
                 for par in param_list:
@@ -59,8 +67,8 @@ def read_section_params(line, param_list):
 
             temp_size = int(val_left) >> int(val_right)
 
-        elif '+' in temp_value:
-            val_left, val_right = temp_value.split('+')
+        elif '+' in temp_expr:
+            val_left, val_right = temp_expr.split('+')
 
             if not val_left.isdigit():
                 for par in param_list:
@@ -74,8 +82,8 @@ def read_section_params(line, param_list):
 
             temp_size = int(val_left) + int(val_right)
 
-        elif '-' in temp_value:
-            val_left, val_right = temp_value.split('-')
+        elif '-' in temp_expr:
+            val_left, val_right = temp_expr.split('-')
 
             if not val_left.isdigit():
                 for par in param_list:
@@ -89,8 +97,8 @@ def read_section_params(line, param_list):
 
             temp_size = int(val_left) - int(val_right)
 
-        elif '*' in temp_value:
-            val_left, val_right = temp_value.split('*')
+        elif '*' in temp_expr:
+            val_left, val_right = temp_expr.split('*')
 
             if not val_left.isdigit():
                 for par in param_list:
@@ -104,8 +112,8 @@ def read_section_params(line, param_list):
 
             temp_size = int(val_left) * int(val_right)
 
-        elif '/' in temp_value:
-            val_left, val_right = temp_value.split('/')
+        elif '/' in temp_expr:
+            val_left, val_right = temp_expr.split('/')
 
             if not val_left.isdigit():
                 for par in param_list:
@@ -120,9 +128,12 @@ def read_section_params(line, param_list):
             temp_size = int(val_left) / int(val_right)
 
         else:
-            param.name = '! unsupported expr'
-            param.value = 0
-            return param
+            print('fatal: bad parameter value %s, line %i' % (temp_name, 1)) #TODO line number
+            exit()
+    
+    # * simple size of parameter
+    else:
+        temp_size = temp_expr
             
     
     param.name =  temp_name
@@ -231,33 +242,53 @@ def read_section_pins(line, param_list):
     return pin_arr
 
 
+#* fatals:
+# no modules in file
+# duplicate name of module
+# two or more modules modules have the maximum number of attachments
+#
+#* warning:
+# two or more non-callable modules. Top module will be chosen as module with the most attachments
 def get_module_name(lines):
     names = []
     module_list = []
-    module_name = ''
+    top_module_name = ''
     attachments_list = []
 
     # getting list of module names
     for line in lines:
-        if 'module ' in line:
-            if line.find('(') != -1:
-                name = line[line.find('module') + len('module') + 1:line.find('(')]
-            else:
-                name = line[line.find('module') + len('module') + 1:]
-            names.append(name)
-    if not names:
-        return
+        if '//' in line:
+            line = line[:line.find('//')].strip()
+        else:
+            line = line.strip()
 
+        if 'module ' in line or 'macromodule ' in line:
+            if line.find('(') != -1:
+                name = line[line.find(' ') + 1:line.find('(')]
+            else:
+                name = line[line.find(' ') + 1:]
+
+            if name in names:
+                print('fatal: duplicate module name %s, line %i' % (name, 1)) #TODO line number
+                exit()
+
+            names.append(name)
+
+    if not names:
+        print('fatal: no modules in file')
+        exit()
+    
 
     # for each module in file
     for module_name in names:
         module_lines = []
         is_module_section = False
-        module = Module(module_name)
+        module_fs = Module_for_search(module_name)
 
         # getting module text -> module_lines
         for line in lines:
-            if 'module ' + module.name in line and not is_module_section:  # found start point of section
+            #   vvvv includes 'macromodule'
+            if 'module ' + module_fs.name in line and not is_module_section:  # found start point of section
                 is_module_section = True
                 continue
             elif is_module_section and 'endmodule' in line:  # found end point of section
@@ -273,24 +304,42 @@ def get_module_name(lines):
         # getting list of attachments (searching another modules in module_lines)
         for att in names:
             for line in module_lines:
-                if att in line and att != module.name and att not in attachments_list:
+                if att in line and att != module_fs.name and att not in module_fs.attachments:
                     # print(line)
                     attachments_list.append(att)
+                    module_fs.attachments.append(att)
+                    module_fs.count_att += 1
 
         # adding modules with name only to list 
-        module_list.append(module)
+        module_list.append(module_fs)
 
-    # entering info if module is callable (is it in attachment list?)
+    # getting info if module is callable (is it in attachment list?)
     for mod in module_list:
         for att in attachments_list:
             if mod.name == att:
                 mod.called = True
-
-
-    # choosing top module as not callable module (first in file (?))
+    
+    max_att = -1
+    count_non_callable = 0
     for mod in module_list:
         if not mod.called:
-            module_name = mod.name
-            break
+            count_non_callable += 1
+            # print(mod.name)
+        if not mod.called and len(mod.attachments) > max_att:
+            max_att = len(mod.attachments)
 
-    return module_name
+    if count_non_callable > 1:
+        print('warning: there are two or more non-callable modules. Top module will be chosen as module with the most attachments')
+
+    count_top = 0
+    # choosing top module as non-callable module
+    for mod in module_list:
+        if not mod.called and len(mod.attachments) == max_att:
+            top_module_name = mod.name
+            count_top += 1
+
+    if count_top > 1:
+        print('fatal: there are two or more modules modules have the maximum number of attachments')
+        exit()
+
+    return top_module_name

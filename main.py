@@ -21,8 +21,8 @@ def main():
         lines = list(filter(None, lines))  # deleting '' lines
         module_name = get_module_name(lines)
 
-        for curr_line in lines:
-            line = Line(curr_line)
+        for curr_line in enumerate(lines): #TODO хранить номер строки
+            line = Line(curr_line[1])
 
             if line.is_comment():
                 continue

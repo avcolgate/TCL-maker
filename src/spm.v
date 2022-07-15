@@ -1,7 +1,7 @@
 
 module spm(clk, rst, x, y, p);
     parameter size = 32;
-	parameter size_right = size ^ 1;
+	//parameter size_fatal = size ^ 1;
 	parameter size_left = size << 1;
 	parameter size_plus = size + 1;
 	parameter size_minus = size - 1;
@@ -12,7 +12,7 @@ module spm(clk, rst, x, y, p);
     input y;
     input[size-1:0] x, q;
     output p;
-	inout io;
+	inout [size-1:0] io,ip;
 
     wire[size-1:1] pp;
     wire[size-1:0] xy;
@@ -24,6 +24,7 @@ module spm(clk, rst, x, y, p);
         CSADD csa (.clk(clk), .rst(rst), .x(x[i]&y), .y(pp[i+1]), .sum(pp[i]));
     end endgenerate
     TCMP tcmp (.clk(clk), .rst(rst), .a(x[size-1]&y), .s(pp[size-1]));
+
 
 endmodule
 
@@ -81,3 +82,31 @@ module CSADD(clk, rst, x, y, sum);
         end
     end
 endmodule
+
+//module spm2(clk, rst, x, y, p);
+//    parameter size = 32;
+//	//parameter size_fatal = size ^ 1;
+//	parameter size_left = size << 1;
+//	parameter size_plus = size + 1;
+//	parameter size_minus = size - 1;
+//	parameter size_mul = size * 100;
+//	parameter size_div = size / 8;
+//	
+//    input clk, rst;
+//    input y;
+//    input[size-1:0] x, q;
+//    output p;
+//	inout [size-1:0] io,ip;
+//
+//    wire[size-1:1] pp;
+//    wire[size-1:0] xy;
+//
+//    genvar i;
+//
+//    CSADD csa0 (.clk(clk), .rst(rst), .x(x[0]&y), .y(pp[1]), .sum(p));
+//    generate for(i=1; i<size-1; i=i+1) begin
+//        CSADD csa (.clk(clk), .rst(rst), .x(x[i]&y), .y(pp[i+1]), .sum(pp[i]));
+//    end endgenerate
+//    TCMP tcmp (.clk(clk), .rst(rst), .a(x[size-1]&y), .s(pp[size-1]));
+//
+//endmodule

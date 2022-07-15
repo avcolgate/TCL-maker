@@ -5,7 +5,8 @@ class Module:
         self.inputs = []
         self.outputs = []
         self.inouts = []
-        self.called = False
+        # self.attachments = []
+        # self.called = False
 
     def print(self):
         if self.name == '':
@@ -49,6 +50,15 @@ class Module:
             self.inouts.append(pin)
         else:
             print('fatal: wrong type of pin %s' % pin.name)
+
+
+class Module_for_search():
+    def __init__(self, name=''):
+        self.name = name
+        self.attachments = []
+        self.called = False
+        self.count_att = 0
+
 
 
 class Pin:
