@@ -6,7 +6,7 @@ class Line:
         self.content = content
     
     def is_comment(self):
-        if re.sub("[ |\t]", "", self.content).find('//') == 0:
+        if self.content.strip().find('//') == 0:
             return True
         return False
 

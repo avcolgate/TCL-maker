@@ -1,4 +1,3 @@
-from numpy import count_nonzero
 from class_module import *
 from class_line import *
 
@@ -14,15 +13,13 @@ def read_section_name(line):  # ? delete??
 
 
 # * fatals: 
-# bad expression in size
 # duplicate name
-def read_section_params(line, param_list):
+# unknown expression in parameter size
+# unknown parameter in parameter size
+def read_section_params(line, param_list, line_num):
     param = Param()
 
-    if '//' in line.content:
-        temp = line.content[:line.content.find('//')]
-    else:
-        temp = line.content
+    temp = line.content
 
     temp = temp.replace('parameter', '')
     temp = re.sub("[;| |\t|,]", "", temp)
@@ -31,7 +28,7 @@ def read_section_params(line, param_list):
 
     for par in param_list:
         if par.name == temp_name:
-            print('fatal: duplicate parameter %s, line %i' % (temp_name, 1)) #TODO line number
+            print("fatal: duplicate parameter '%s', line %i" % (temp_name, line_num + 1))
             exit()
 
     # * parametric size of parameter
@@ -39,96 +36,150 @@ def read_section_params(line, param_list):
 
         if '<<' in temp_expr:
             val_left, val_right = temp_expr.split('<<')
+            check = False
 
             if not val_left.isdigit():
                 for par in param_list:
                     if val_left == par.name:
                         val_left = par.value
+                        check = True
+                        break
 
             if not val_right.isdigit():
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
+                        check = True
+                        break
+
+            if not check:
+                print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                exit()
 
             temp_size = int(val_left) << int(val_right)
 
         elif '>>' in temp_expr:
             val_left, val_right = temp_expr.split('>>')
+            check = False
 
             if not val_left.isdigit():
                 for par in param_list:
                     if val_left == par.name:
                         val_left = par.value
+                        check = True
+                        break
 
             if not val_right.isdigit():
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
+                        check = True
+                        break
+
+            if not check:
+                print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                exit()
 
             temp_size = int(val_left) >> int(val_right)
 
         elif '+' in temp_expr:
             val_left, val_right = temp_expr.split('+')
+            check = False
 
             if not val_left.isdigit():
                 for par in param_list:
                     if val_left == par.name:
                         val_left = par.value
+                        check = True
+                        break
 
             if not val_right.isdigit():
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
+                        check = True
+                        break
+
+            if not check:
+                print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                exit()
 
             temp_size = int(val_left) + int(val_right)
 
         elif '-' in temp_expr:
             val_left, val_right = temp_expr.split('-')
+            check = False
 
             if not val_left.isdigit():
                 for par in param_list:
                     if val_left == par.name:
                         val_left = par.value
+                        check = True
+                        break
 
             if not val_right.isdigit():
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
+                        check = True
+                        break
+
+            if not check:
+                print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                exit()
 
             temp_size = int(val_left) - int(val_right)
 
         elif '*' in temp_expr:
             val_left, val_right = temp_expr.split('*')
+            check = False
 
             if not val_left.isdigit():
                 for par in param_list:
                     if val_left == par.name:
                         val_left = par.value
+                        check = True
+                        break
 
             if not val_right.isdigit():
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
+                        check = True
+                        break
+
+            if not check:
+                print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                exit()
 
             temp_size = int(val_left) * int(val_right)
 
         elif '/' in temp_expr:
             val_left, val_right = temp_expr.split('/')
+            check = False
 
             if not val_left.isdigit():
                 for par in param_list:
                     if val_left == par.name:
                         val_left = par.value
+                        check = True
+                        break
 
             if not val_right.isdigit():
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
+                        check = True
+                        break
+
+            if not check:
+                print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                exit()
 
             temp_size = int(val_left) / int(val_right)
 
         else:
-            print('fatal: bad parameter value %s, line %i' % (temp_name, 1)) #TODO line number
+            print('fatal: unknown expression in parameter value %s, line %i' % (temp_name, line_num + 1))
             exit()
     
     # * simple size of parameter
@@ -141,16 +192,14 @@ def read_section_params(line, param_list):
 
     return param
 
-
+# * fatals:
+# wrong type of pin
 def read_section_pins(line, param_list):
     pin_arr = []
     pin_direction = ''
     k = 1
 
-    if '//' in line.content:
-        temp = line.content[:line.content.find('//')].strip()
-    else:
-        temp = line.content.strip()
+    temp = line.content.strip()
 
     temp_direction_name = re.sub(r'\[[^()]*\]', '', temp) # substracting size
 
@@ -254,13 +303,9 @@ def get_module_name(lines):
     module_list = []
     top_module_name = ''
     attachments_list = []
-
     # getting list of module names
-    for line in lines:
-        if '//' in line:
-            line = line[:line.find('//')].strip()
-        else:
-            line = line.strip()
+    for line_num, line in enumerate(lines):
+        line = line.strip()
 
         if 'module ' in line or 'macromodule ' in line:
             if line.find('(') != -1:
@@ -269,7 +314,7 @@ def get_module_name(lines):
                 name = line[line.find(' ') + 1:]
 
             if name in names:
-                print('fatal: duplicate module name %s, line %i' % (name, 1)) #TODO line number
+                print('fatal: duplicate module name %s, line %i' % (name, line_num + 1))
                 exit()
 
             names.append(name)
@@ -295,8 +340,6 @@ def get_module_name(lines):
                 is_module_section = False
                 continue
             elif is_module_section:
-                if '//' in line:
-                    line = line[:line.find('//')]
                 line = re.sub("[\t]", "", line)
                 line = line.replace('  ', '')
                 module_lines.append(line)
@@ -339,7 +382,7 @@ def get_module_name(lines):
             count_top += 1
 
     if count_top > 1:
-        print('fatal: there are two or more modules modules have the maximum number of attachments')
+        print('fatal: there are two or more non-callable modules modules have the maximum number of attachments')
         exit()
 
     return top_module_name
