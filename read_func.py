@@ -15,16 +15,15 @@ def read_section_name(line):  # ? delete??
 
 # * fatals: 
 # duplicate name
-# unknown mathematical operation  in parameter size
+# unknown mathematical operation in parameter size
 # unknown subparameter in parameter size
-# negative value of parameter
-# float value of parameter
+# negative values in parameter size
+# float values in parameter size
 # difficult expression in parameter size
 def read_section_params(line, param_list, line_num):
     param = Param()
 
     temp = line.content
-
     temp = temp.replace('parameter', '')
     temp = re.sub("[;| |\t|,]", "", temp)
     
@@ -225,7 +224,7 @@ def read_section_params(line, param_list, line_num):
     else:
         temp_size = temp_expr
 
-    if not str(temp_size).isdigit() or int(temp_size) <= 0:
+    if not str(temp_size).isdigit() or int(temp_size) <= 0: #? is it ok?
         print("fatal: parameter '%s' must be positive integer, line %i" % (temp_name, line_num + 1))
         exit()
     
@@ -234,8 +233,9 @@ def read_section_params(line, param_list, line_num):
 
     return param
 
+
 # * fatals:
-# wrong type of pin
+# 
 def read_section_pins(line, param_list):
     pin_arr = []
     pin_direction = ''
@@ -250,19 +250,12 @@ def read_section_pins(line, param_list):
     pin_size = temp[temp.find('['):temp.find(']') + 1] # [...]
 
     temp_name = temp_direction_name.replace(pin_direction, '')
+    temp_name = temp_name.replace('reg', '').replace('wire', '') #? also delete SystemVerilog's 'logic'?
     temp_name = re.sub("[;| |\t]", "", temp_name) # name1,name2,..
     temp_name_arr = temp_name.split(',')
     temp_name_arr = list(filter(None, temp_name_arr))  # deleting '' names
     # print('temp_name_arr:', temp_name_arr) # names array
-
-    if not (pin_direction == 'input' or pin_direction == 'output' or pin_direction == 'inout'):
-        print('fatal: wrong type of pin %s' %temp_name)
-        exit()
-
-    temp = temp.replace(pin_direction, '').replace('reg', '')  # ? ignore   'reg'?
-    temp = temp.replace(pin_direction, '').replace('wire', '')  # ? ignore  'wire'?
-    temp = temp.replace(pin_direction, '').replace('logic', '')  # ? ignore 'logic'?
-    # print(pin_direction, end=' ')
+    
 
     # * parametric size
     if pin_size:

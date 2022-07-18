@@ -53,11 +53,13 @@ def main():
                 if line.is_param_section():
                     param = read_section_params(line, module.params, line_num)
                     module.append_params(param)
+                    continue
 
                 if line.is_pin_section():
                     pin_arr = read_section_pins(line, module.params)
                     for pin in pin_arr:
                         module.append_pin(pin)
+                    continue
 
                 if line.is_endmodule_section():
                     is_module_section = False

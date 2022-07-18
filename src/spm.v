@@ -8,13 +8,12 @@ module spm (clk, rst, x, y, p);
 	parameter size_minus = size - 1;
 	parameter size_mul = size * 100;
 	parameter size_div = size / 16;
-	parameter size_neg = size_mul<<50;
 	
 	
     input clk, rst;
     input y;
     input[size-1:0] x, q;
-    output p;
+    output reg e, p;
 	inout [size-1:0] io,ip;
 
     wire[size-1:1] pp;
