@@ -5,8 +5,6 @@ class Module:
         self.inputs = []
         self.outputs = []
         self.inouts = []
-        # self.attachments = []
-        # self.called = False
 
     def print(self):
         if self.name == '':
@@ -15,10 +13,10 @@ class Module:
         else:
             print('# Name\n' + self.name)
 
-        # if len(self.params):
-        #     print('# Parameters')
-        # for param in self.params:
-        #     print('%s: %i' % (param.name, param.value))
+        if len(self.params):
+            print('# Parameters')
+        for param in self.params:
+            print('%s: %i' % (param.name, param.value))
 
         if len(self.inputs):
             print('# Inputs [%i]' % len(self.inputs))

@@ -7,7 +7,9 @@ module spm (clk, rst, x, y, p);
 	parameter size_plus = size + 1;
 	parameter size_minus = size - 1;
 	parameter size_mul = size * 100;
-	parameter size_div = size / 8;
+	parameter size_div = size / 16;
+	parameter size_neg = size_mul<<50;
+	
 	
     input clk, rst;
     input y;

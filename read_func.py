@@ -1,5 +1,6 @@
 from class_module import *
 from class_line import *
+from func import *
 
 
 def read_section_name(line):  # ? delete??
@@ -15,7 +16,10 @@ def read_section_name(line):  # ? delete??
 # * fatals: 
 # duplicate name
 # unknown expression in parameter size
-# unknown parameter in parameter size
+# unknown subparameter in parameter size
+# negative value of parameter
+# float value of parameter
+# difficult expression in parameter size
 def read_section_params(line, param_list, line_num):
     param = Param()
 
@@ -32,7 +36,7 @@ def read_section_params(line, param_list, line_num):
             exit()
 
     # * parametric size of parameter
-    if not temp_expr.isdigit():
+    if not is_number(temp_expr):
 
         if '<<' in temp_expr:
             val_left, val_right = temp_expr.split('<<')
@@ -44,19 +48,24 @@ def read_section_params(line, param_list, line_num):
                         val_left = par.value
                         check = True
                         break
-
-            if not val_right.isdigit():
+            elif not val_right.isdigit():
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
                         check = True
                         break
+            else:
+                check = True
 
             if not check:
                 print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
                 exit()
 
-            temp_size = int(val_left) << int(val_right)
+            if is_number(val_left) and is_number(val_right):
+                temp_size = int(val_left) << int(val_right)
+            else:
+                print("fatal: unknown expression in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                exit()
 
         elif '>>' in temp_expr:
             val_left, val_right = temp_expr.split('>>')
@@ -68,20 +77,25 @@ def read_section_params(line, param_list, line_num):
                         val_left = par.value
                         check = True
                         break
-
-            if not val_right.isdigit():
+            elif not val_right.isdigit():
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
                         check = True
                         break
+            else:
+                check = True
 
             if not check:
                 print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
                 exit()
 
-            temp_size = int(val_left) >> int(val_right)
-
+            if is_number(val_left) and is_number(val_right):
+                temp_size = int(val_left) >> int(val_right)
+            else:
+                print("fatal: unknown expression in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                exit()
+            
         elif '+' in temp_expr:
             val_left, val_right = temp_expr.split('+')
             check = False
@@ -92,22 +106,28 @@ def read_section_params(line, param_list, line_num):
                         val_left = par.value
                         check = True
                         break
-
-            if not val_right.isdigit():
+            elif not val_right.isdigit():
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
                         check = True
                         break
+            else:
+                check = True
 
             if not check:
                 print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
                 exit()
 
-            temp_size = int(val_left) + int(val_right)
+            if is_number(val_left) and is_number(val_right):
+                temp_size = int(val_left) + int(val_right)
+            else:
+                print("fatal: unknown expression in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                exit()
 
         elif '-' in temp_expr:
             val_left, val_right = temp_expr.split('-')
+
             check = False
 
             if not val_left.isdigit():
@@ -116,19 +136,24 @@ def read_section_params(line, param_list, line_num):
                         val_left = par.value
                         check = True
                         break
-
-            if not val_right.isdigit():
+            elif not val_right.isdigit():
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
                         check = True
                         break
+            else:
+                check = True
 
             if not check:
                 print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
                 exit()
 
-            temp_size = int(val_left) - int(val_right)
+            if is_number(val_left) and is_number(val_right):
+                temp_size = int(val_left) - int(val_right)
+            else:
+                print("fatal: unknown expression in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                exit()
 
         elif '*' in temp_expr:
             val_left, val_right = temp_expr.split('*')
@@ -140,19 +165,24 @@ def read_section_params(line, param_list, line_num):
                         val_left = par.value
                         check = True
                         break
-
-            if not val_right.isdigit():
+            elif not val_right.isdigit():
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
                         check = True
                         break
+            else:
+                check = True
 
             if not check:
                 print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
                 exit()
 
-            temp_size = int(val_left) * int(val_right)
+            if is_number(val_left) and is_number(val_right):
+                temp_size = int(val_left) * int(val_right)
+            else:
+                print("fatal: unknown expression in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                exit()
 
         elif '/' in temp_expr:
             val_left, val_right = temp_expr.split('/')
@@ -164,19 +194,28 @@ def read_section_params(line, param_list, line_num):
                         val_left = par.value
                         check = True
                         break
-
-            if not val_right.isdigit():
+            elif not val_right.isdigit():
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
                         check = True
                         break
+            else:
+                check = True
 
             if not check:
                 print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
                 exit()
 
-            temp_size = int(val_left) / int(val_right)
+            if is_number(val_left) and is_number(val_right):
+                if int(val_left) % int(val_right) == 0:
+                    temp_size = int(int(val_left) / int(val_right))
+                else:
+                    print("fatal: parameter '%s' must be positive integer, line %i" % (temp_name, line_num + 1))
+                    exit()
+            else:
+                print("fatal: unknown expression in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                exit()
 
         else:
             print('fatal: unknown expression in parameter value %s, line %i' % (temp_name, line_num + 1))
@@ -185,7 +224,10 @@ def read_section_params(line, param_list, line_num):
     # * simple size of parameter
     else:
         temp_size = temp_expr
-            
+
+    if not str(temp_size).isdigit() or int(temp_size) <= 0:
+        print("fatal: parameter '%s' must be positive integer, line %i" % (temp_name, line_num + 1))
+        exit()
     
     param.name =  temp_name
     param.value = int(temp_size)
