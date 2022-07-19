@@ -20,6 +20,8 @@ def read_section_name(line):  # ? delete??
 # negative values in parameter size
 # float values in parameter size
 # difficult expression in parameter size
+# too large parameter size
+# too large argument in '<<' operation
 def read_section_params(line, param_list, line_num):
     param = Param()
 
@@ -242,7 +244,7 @@ def read_section_params(line, param_list, line_num):
             print('fatal: unknown expression in parameter value %s, line %i' % (temp_name, line_num + 1))
             exit()
     
-    # * simple size of parameter
+    # * simple parameter size
     else:
         temp_size = temp_expr
 
@@ -258,6 +260,13 @@ def read_section_params(line, param_list, line_num):
 
 # * fatals:
 # duplicate name
+# unknown parameter in pin size
+# negative pin size
+# negitive pin size values
+# unknown expression in pin size values (not +/-) => unknown parameter
+# float pin size
+# * warnings:
+# equal limits in pin size
 def read_section_pins(line, param_list, pin_list, line_num):
     pin_arr = []
     pin_direction = 'NaN'
@@ -290,24 +299,25 @@ def read_section_pins(line, param_list, pin_list, line_num):
         pin_size = re.sub("[\[|\]| |\t]", "", pin_size)  # deleting [] and whitespaces
         temp_size_arr = pin_size.split(':')
         start_val, end_val = temp_size_arr
-        print('temp_size_arr:', temp_size_arr) # sizes array
+        # print('temp_size_arr:', temp_size_arr) # sizes array
 
-        if not start_val.isdigit():  # if parameter in LEFT part
+        if not is_number(start_val):  # if parameter in LEFT part
 
             if '-' in start_val:
                 start_val = start_val.split('-')
+                start_val_left, start_val_right = start_val
                 k = -1
             elif '+' in start_val:
                 start_val = start_val.split('+')
+                start_val_left, start_val_right = start_val
                 k = 1
             else:
-                print("fatal: unknown expression in size of pin '%s', line %i" % (name, line_num + 1))
-                exit()    
+                start_val_left = start_val
+                start_val_right = 0
+                k = 1
 
-            start_val_left, start_val_right = start_val
-            print(start_val)
-            
-            check = 0 # flag if all 2 args are digits or found in parameters
+            check = 0
+
             if not is_number(start_val_left):  # parameter in left subpart
                 for param in param_list:
                     if param.name == start_val_left:
@@ -316,6 +326,7 @@ def read_section_pins(line, param_list, pin_list, line_num):
                         break
             else:
                 check += 1
+
             if not is_number(start_val_right):  # parameter in right subpart
                 for param in param_list:
                     if param.name == start_val_right:
@@ -326,32 +337,35 @@ def read_section_pins(line, param_list, pin_list, line_num):
                 check += 1
 
             if check < 2:
-                print("fatal: unknown parameter in size of pin, line %i" % (line_num + 1))
+                print("fatal: unknown parameter in pin size, line %i" % (line_num + 1))
                 exit()
             
             if str(start_val_left).isdigit() and str(start_val_right).isdigit():
-                start_val = int(start_val_left) + int(start_val_right) * k
+                start_val = int(start_val_left) + k * int(start_val_right) 
+                if start_val < 0:
+                    print("fatal: arguments in size must be !positive integer. Pin '%s', line %i" % (temp_name, line_num + 1))
+                    exit()
             else:
-                print("fatal: arguments in size must be integer. Parameter '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: arguments in size must be positive !integer. Pin '%s', line %i" % (temp_name, line_num + 1))
                 exit()
 
-        if not end_val.isdigit():  # if parameter in RIGHT part
+        if not is_number(end_val):  # if parameter in RIGHT part
 
             if '-' in end_val:
                 end_val = end_val.split('-')
+                end_val_left, end_val_right = end_val
                 k = -1
             elif '+' in end_val:
                 end_val = end_val.split('+')
+                end_val_left, end_val_right = end_val
                 k = 1
             else:
-                print("fatal: unknown expression in size of pin '%s', line %i" % (name, line_num + 1))
-                exit()    
+                end_val_left = end_val
+                end_val_right = 0
+                k = 1
 
-            end_val_left, end_val_right = end_val
+            check = 0
 
-            print(end_val)
-
-            check = 0 # flag if all 2 args are digits or found in parameters
             if not is_number(end_val_left):  # parameter in left subpart
                 for param in param_list:
                     if param.name == end_val_left:
@@ -360,6 +374,7 @@ def read_section_pins(line, param_list, pin_list, line_num):
                         break
             else:
                 check += 1
+
             if not is_number(end_val_right):  # parameter in right subpart
                 for param in param_list:
                     if param.name == end_val_right:
@@ -370,16 +385,26 @@ def read_section_pins(line, param_list, pin_list, line_num):
                 check += 1
 
             if check < 2:
-                print("fatal: unknown parameter in size of pin, line %i" % (line_num + 1))
+                print("fatal: unknown parameter in pin size, line %i" % (line_num + 1))
                 exit()
 
             if str(start_val_left).isdigit() and str(start_val_right).isdigit():
-                end_val = int(end_val_left) + int(end_val_right) * k
+                end_val = int(end_val_left) + k * int(end_val_right)
+                if end_val < 0:
+                    print("fatal: arguments in size must be !positive integer. Pin '%s', line %i" % (temp_name, line_num + 1))
+                    exit()
             else:
-                print("fatal: arguments in size must be integer. Parameter '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: arguments in size must be positive !integer. Pin '%s', line %i" % (temp_name, line_num + 1))
                 exit()
 
-        pin_true_size = abs(int(end_val) - int(start_val)) + 1
+        if start_val == end_val:
+            print("warning: equal limits in the pin size. Pin '%s', line %i" % (temp_name, line_num + 1))
+
+        pin_true_size = int(start_val) - int(end_val) + 1
+
+        if pin_true_size < 1:
+            print("fatal: pin size must be positive integer. Pin '%s', line %i" % (temp_name, line_num + 1))
+            exit()
 
     # * simple size (=1)
     else:
@@ -394,7 +419,7 @@ def read_section_pins(line, param_list, pin_list, line_num):
 
 #* fatals:
 # no modules in file
-# duplicate name of module
+# duplicate module name
 # two or more modules modules have the maximum number of attachments
 #
 #* warning:
