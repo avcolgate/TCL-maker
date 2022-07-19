@@ -56,7 +56,7 @@ def main():
                     continue
 
                 if line.is_pin_section():
-                    pin_arr = read_section_pins(line, module.params)
+                    pin_arr = read_section_pins(line, module.params, module.pins, line_num)
                     for pin in pin_arr:
                         module.append_pin(pin)
                     continue

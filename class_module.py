@@ -14,11 +14,12 @@ class Module:
         else:
             print('Module: ' + self.name)
 
-        # if len(self.params):
-        #     print('# Parameters')
-        # for param in self.params:
-        #     print('%s: %i' % (param.name, param.value))
+        print("Parameters [%i]:" % len(self.pins))
+        for param in self.params:
+            print('%s = %i' % (param.name, param.value))
+        print('')
 
+        print("Pins [%i]:" % len(self.pins))
         for pin in self.pins:
             if pin.direction == 'input':
                 print('%7s %8s: %2i (%s)' % (pin.direction, pin.name, pin.size, pin.type))

@@ -1,18 +1,19 @@
 
 module spm (clk, rst, x, y, p);
     parameter size = 32;
+	parameter size_mini = 4;
 	//parameter size_fatal = size ^ 1;
-	parameter size_left = size << 1;
-	parameter size_right = size >> 1;
-	parameter size_plus = size + 1;
-	parameter size_minus = size - 1;
+	parameter size_left = size << 15;
+	parameter size_right = size >> size_mini;
+	parameter size_plus = size + size;
+	parameter size_minus = size - size_mini;
 	parameter size_mul = size * 100;
-	parameter size_div = size / 16;
+	parameter size_div = size / size_mini;
 	
 	
     input clk, rst;
     input y;
-    input[size-1:0] x, q;
+    //input[150:-60] x, q;
     output reg e, p;
 	inout [size-1:0] io,ip;
 

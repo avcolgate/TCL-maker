@@ -39,53 +39,64 @@ def read_section_params(line, param_list, line_num):
 
         if '<<' in temp_expr:
             val_left, val_right = temp_expr.split('<<')
-            check = False
+            check = 0
 
             if not is_number(val_left):
                 for par in param_list:
                     if val_left == par.name:
                         val_left = par.value
-                        check = True
+                        check += 1
                         break
-            elif not is_number(val_right):
+            else:
+                check += 1
+
+            if not is_number(val_right):
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
-                        check = True
+                        check += 1
                         break
             else:
-                check = True
+                check += 1
 
-            if not check:
+            # check if every parameter is a number now
+            if check < 2:
                 print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
                 exit()
 
             if str(val_left).isdigit() and str(val_right).isdigit():
-                temp_size = int(val_left) << int(val_right)
+                if int(val_right) > 20:
+                    print("fatal: the argument is too large. Parameter '%s', line %i" % (temp_name, line_num + 1))
+                    exit()
+                else:
+                    temp_size = int(val_left) << int(val_right)
             else:
                 print("fatal: arguments in '<<' operation must be positive integer. Parameter '%s', line %i" % (temp_name, line_num + 1))
                 exit()
 
         elif '>>' in temp_expr:
             val_left, val_right = temp_expr.split('>>')
-            check = False
+            check = 0
 
             if not is_number(val_left):
                 for par in param_list:
                     if val_left == par.name:
                         val_left = par.value
-                        check = True
+                        check += 1
                         break
-            elif not is_number(val_right):
+            else:
+                check += 1
+
+            if not is_number(val_right):
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
-                        check = True
+                        check += 1
                         break
             else:
-                check = True
+                check += 1
 
-            if not check:
+            if check < 2:
                 print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
                 exit()
 
@@ -97,24 +108,27 @@ def read_section_params(line, param_list, line_num):
             
         elif '+' in temp_expr:
             val_left, val_right = temp_expr.split('+')
-            check = False
+            check = 0
 
             if not is_number(val_left):
                 for par in param_list:
                     if val_left == par.name:
                         val_left = par.value
-                        check = True
+                        check += 1
                         break
-            elif not is_number(val_right):
+            else:
+                check += 1
+
+            if not is_number(val_right):
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
-                        check = True
+                        check += 1
                         break
             else:
-                check = True
+                check += 1
 
-            if not check:
+            if check < 2:
                 print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
                 exit()
 
@@ -126,25 +140,27 @@ def read_section_params(line, param_list, line_num):
 
         elif '-' in temp_expr:
             val_left, val_right = temp_expr.split('-')
-
-            check = False
+            check = 0
 
             if not is_number(val_left):
                 for par in param_list:
                     if val_left == par.name:
                         val_left = par.value
-                        check = True
+                        check += 1
                         break
-            elif not is_number(val_right):
+            else:
+                check += 1
+
+            if not is_number(val_right):
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
-                        check = True
+                        check += 1
                         break
             else:
-                check = True
+                check += 1
 
-            if not check:
+            if check < 2:
                 print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
                 exit()
 
@@ -156,24 +172,27 @@ def read_section_params(line, param_list, line_num):
 
         elif '*' in temp_expr:
             val_left, val_right = temp_expr.split('*')
-            check = False
+            check = 0
 
             if not is_number(val_left):
                 for par in param_list:
                     if val_left == par.name:
                         val_left = par.value
-                        check = True
+                        check += 1
                         break
-            elif not is_number(val_right):
+            else:
+                check += 1
+
+            if not is_number(val_right):
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
-                        check = True
+                        check += 1
                         break
             else:
-                check = True
+                check += 1
 
-            if not check:
+            if check < 2:
                 print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
                 exit()
 
@@ -185,24 +204,27 @@ def read_section_params(line, param_list, line_num):
 
         elif '/' in temp_expr:
             val_left, val_right = temp_expr.split('/')
-            check = False
+            check = 0
 
             if not is_number(val_left):
                 for par in param_list:
                     if val_left == par.name:
                         val_left = par.value
-                        check = True
+                        check += 1
                         break
-            elif not is_number(val_right):
+            else:
+                check += 1
+                
+            if not is_number(val_right):
                 for par in param_list:
                     if val_right == par.name:
                         val_right = par.value
-                        check = True
+                        check += 1
                         break
             else:
-                check = True
+                check += 1
 
-            if not check:
+            if check < 2:
                 print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
                 exit()
 
@@ -224,21 +246,21 @@ def read_section_params(line, param_list, line_num):
     else:
         temp_size = temp_expr
 
-    if not str(temp_size).isdigit() or int(temp_size) <= 0: #? is it ok?
-        print("fatal: parameter '%s' must be positive integer, line %i" % (temp_name, line_num + 1))
+    if str(temp_size).isdigit() and int(temp_size) > 0 and int(temp_size) < 100000:
+        param.name =  temp_name
+        param.value = int(temp_size)
+    else:
+        print("fatal: parameter '%s' must be positive integer and less than 100000, line %i" % (temp_name, line_num + 1))
         exit()
     
-    param.name =  temp_name
-    param.value = int(temp_size)
-
     return param
 
 
 # * fatals:
-# 
-def read_section_pins(line, param_list):
+# duplicate name
+def read_section_pins(line, param_list, pin_list, line_num):
     pin_arr = []
-    pin_direction = ''
+    pin_direction = 'NaN'
     k = 1
 
     temp = line.content.strip()
@@ -255,7 +277,12 @@ def read_section_pins(line, param_list):
     temp_name_arr = temp_name.split(',')
     temp_name_arr = list(filter(None, temp_name_arr))  # deleting '' names
     # print('temp_name_arr:', temp_name_arr) # names array
-    
+
+    for pin in pin_list:
+        for name in temp_name_arr:
+            if pin.name == name:
+                print("fatal: duplicate pin name '%s', line %i" % (name, line_num + 1))
+                exit()    
 
     # * parametric size
     if pin_size:
@@ -263,55 +290,94 @@ def read_section_pins(line, param_list):
         pin_size = re.sub("[\[|\]| |\t]", "", pin_size)  # deleting [] and whitespaces
         temp_size_arr = pin_size.split(':')
         start_val, end_val = temp_size_arr
-        # print('temp_size_arr:', temp_size_arr) # sizes array
+        print('temp_size_arr:', temp_size_arr) # sizes array
 
         if not start_val.isdigit():  # if parameter in LEFT part
 
             if '-' in start_val:
                 start_val = start_val.split('-')
                 k = -1
-
             elif '+' in start_val:
                 start_val = start_val.split('+')
                 k = 1
+            else:
+                print("fatal: unknown expression in size of pin '%s', line %i" % (name, line_num + 1))
+                exit()    
 
             start_val_left, start_val_right = start_val
-
-            if not start_val_left.isdigit():  # parameter in left subpart
+            print(start_val)
+            
+            check = 0 # flag if all 2 args are digits or found in parameters
+            if not is_number(start_val_left):  # parameter in left subpart
                 for param in param_list:
                     if param.name == start_val_left:
                         start_val_left = param.value
-
-            if not start_val_right.isdigit():  # parameter in right subpart
+                        check += 1
+                        break
+            else:
+                check += 1
+            if not is_number(start_val_right):  # parameter in right subpart
                 for param in param_list:
                     if param.name == start_val_right:
                         start_val_right = param.value
+                        check += 1
+                        break
+            else:
+                check += 1
 
-            start_val = int(start_val_left) + int(start_val_right) * k
+            if check < 2:
+                print("fatal: unknown parameter in size of pin, line %i" % (line_num + 1))
+                exit()
+            
+            if str(start_val_left).isdigit() and str(start_val_right).isdigit():
+                start_val = int(start_val_left) + int(start_val_right) * k
+            else:
+                print("fatal: arguments in size must be integer. Parameter '%s', line %i" % (temp_name, line_num + 1))
+                exit()
 
         if not end_val.isdigit():  # if parameter in RIGHT part
 
             if '-' in end_val:
                 end_val = end_val.split('-')
                 k = -1
-
             elif '+' in end_val:
                 end_val = end_val.split('+')
                 k = 1
+            else:
+                print("fatal: unknown expression in size of pin '%s', line %i" % (name, line_num + 1))
+                exit()    
 
             end_val_left, end_val_right = end_val
 
-            if not end_val_left.isdigit():  # parameter in left subpart
+            print(end_val)
+
+            check = 0 # flag if all 2 args are digits or found in parameters
+            if not is_number(end_val_left):  # parameter in left subpart
                 for param in param_list:
                     if param.name == end_val_left:
                         end_val_left = param.value
-
-            if not end_val_right.isdigit():  # parameter in right subpart
+                        check += 1
+                        break
+            else:
+                check += 1
+            if not is_number(end_val_right):  # parameter in right subpart
                 for param in param_list:
                     if param.name == end_val_right:
                         end_val_right = param.value
+                        check += 1
+                        break
+            else:
+                check += 1
 
-            end_val = int(end_val_left) + int(end_val_right) * k
+            if check < 2:
+                print("fatal: unknown parameter in size of pin, line %i" % (line_num + 1))
+                exit()
+
+            if str(start_val_left).isdigit() and str(start_val_right).isdigit():
+                end_val = int(end_val_left) + int(end_val_right) * k
+            else:
+                print("fatal: arguments in size must be integer. Parameter '%s', line %i" % (temp_name, line_num + 1))
+                exit()
 
         pin_true_size = abs(int(end_val) - int(start_val)) + 1
 
