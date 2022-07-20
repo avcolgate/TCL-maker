@@ -443,6 +443,7 @@ def get_module_name(lines):
 
         temp_line = line.strip()
         module_fs.text += temp_line + ' '
+        module_fs.text_arr.append(temp_line)
 
         if not module_fs.name:
             temp_name += temp_line + ' '
@@ -488,7 +489,7 @@ def get_module_name(lines):
     count_top = 0
     for mod in module_list:
         if not mod.called and mod.count_att == max_att:
-            top_module_name = mod.name
+            top_module_name = mod
             count_top += 1
 
     if count_top > 1:

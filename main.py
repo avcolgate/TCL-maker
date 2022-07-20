@@ -30,9 +30,12 @@ def main():
                 print('fatal: module name is not specified')
                 exit()
         else:
-            module_name = get_module_name(lines)
+            top_module = get_module_name(lines)
+            module_name = top_module.name
+            module_body = top_module.text_arr
 
-        for line_num, curr_line in enumerate(lines):
+
+        for line_num, curr_line in enumerate(module_body):
             line = Line(curr_line)
 
             if line.is_comment():

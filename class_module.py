@@ -58,6 +58,7 @@ class Module_for_search():
         self.called = False
         self.count_att = 0
         self.text = ''
+        self.text_arr = []
 
 
 
