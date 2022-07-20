@@ -13,7 +13,7 @@ class Module:
             print('Not found')
             return
         else:
-            print('Module: ' + self.name)
+            print('Module: %s\n' % self.name)
 
         print("Parameters [%i]:" % len(self.pins))
         for param in self.params:

@@ -1,5 +1,7 @@
 
-module spm (clk, rst, x, y, p);
+module 
+spm 
+(clk, rst, x, y, p);
     parameter size = 32;
 	parameter size_mini = 4;
 	//parameter size_fatal = size ^ 1;

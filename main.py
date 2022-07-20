@@ -41,19 +41,16 @@ def main():
         for line_num, curr_line in enumerate(module_body): # TODO сделать отдельную функцию
             line = Line(curr_line)
 
-            if line.is_comment():
-                continue
-
-            if '//' in line.content:
-                line.content = line.content[:line.content.find('//')]
+            line.erase_comment()
             
-            if line.is_name_section(module_name):
-                # print(line.content)
-                module.append_name(module_name)
-                is_module_section = True
-                continue
+            if not is_module_section:
+                if line.is_name_section(module_name, module_body, line_num):
+                    # print(line.content)
+                    module.append_name(module_name)
+                    is_module_section = True
+                    continue
 
-            if is_module_section:
+            else:
                 if line.is_param_section():
                     # print(line.content)
                     param = read_section_params(line, module.params, line_num)
