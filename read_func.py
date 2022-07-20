@@ -421,72 +421,55 @@ def read_section_pins(line, param_list, pin_list, line_num):
 # no modules in file
 # duplicate module name
 # two or more modules modules have the maximum number of attachments
-#
 #* warning:
 # two or more non-callable modules. Top module will be chosen as module with the most attachments
 def get_module_name(lines):
+    top_module_name = 'NaN'
     names = []
     module_list = []
-    top_module_name = ''
     attachments_list = []
-    # getting list of module names
+
+    # collecting module names and it's content
+    module_fs = Module_for_search() #TODO можно без создания объекта?
+    temp_name = ''
+
     for line_num, line in enumerate(lines):
-        line = line.strip()
+        if '//' in line:
+            line = line[:line.find('//')]
 
-        if 'module ' in line or 'macromodule ' in line:
-            if line.find('(') != -1:
-                name = line[line.find(' ') + 1:line.find('(')]
-            else:
-                name = line[line.find(' ') + 1:]
+        if ('module' in line or 'macromodule' in line) and not 'endmodule' in line:
+            module_fs = Module_for_search()
+            temp_name = ''
 
-            if name in names:
-                print('fatal: duplicate module name %s, line %i' % (name, line_num + 1))
-                exit()
+        temp_line = line.strip()
+        module_fs.text += temp_line + ' '
 
-            names.append(name)
+        if not module_fs.name:
+            temp_name += temp_line + ' '
+            if ';' in temp_line:
+                temp_name = re.sub(r'\([^()]*\)', '', temp_name)
+                temp_name = temp_name.replace('module', '')
+                temp_name = re.sub('[;| ]', '', temp_name)
+                module_fs.name = temp_name
+                names.append(temp_name)
+                temp_name = ''
 
-    if not names:
+        if 'endmodule' in temp_line:
+            module_list.append(module_fs)
+            module_fs = Module_for_search()
+    
+    if not module_list:
         print('fatal: no modules in file')
         exit()
-    
 
-    # for each module in file
-    for module_name in names:
-        module_lines = []
-        is_module_section = False
-        module_fs = Module_for_search(module_name)
 
-        # getting module text -> module_lines
-        for line in lines:
-            #   vvvv includes 'macromodule'
-            if 'module ' + module_fs.name in line and not is_module_section:  # found start point of section
-                is_module_section = True
-                continue
-            elif is_module_section and 'endmodule' in line:  # found end point of section
-                is_module_section = False
-                continue
-            elif is_module_section:
-                line = re.sub("[\t]", "", line)
-                line = line.replace('  ', '')
-                module_lines.append(line)
-
-        # getting list of attachments (searching another modules in module_lines)
-        for att in names:
-            for line in module_lines:
-                if att in line and att != module_fs.name and att not in module_fs.attachments:
-                    # print(line)
-                    attachments_list.append(att)
-                    module_fs.attachments.append(att)
-                    module_fs.count_att += 1
-
-        # adding modules with name only to list 
-        module_list.append(module_fs)
-
-    # getting info if module is callable (is it in attachment list?)
+    # searching attachmnets in each module
     for mod in module_list:
-        for att in attachments_list:
-            if mod.name == att:
-                mod.called = True
+        for submod in module_list:
+            if submod.name in mod.text and submod.name != mod.name and submod.name not in mod.attachments:
+                mod.attachments.append(submod.name)
+                mod.count_att += 1
+                submod.called = True
     
     max_att = -1
     count_non_callable = 0
@@ -494,16 +477,17 @@ def get_module_name(lines):
         if not mod.called:
             count_non_callable += 1
             # print(mod.name)
-        if not mod.called and len(mod.attachments) > max_att:
-            max_att = len(mod.attachments)
+            if mod.count_att > max_att:
+                max_att = mod.count_att
 
     if count_non_callable > 1:
         print('warning: there are two or more non-callable modules. Top module will be chosen as module with the most attachments')
 
-    count_top = 0
+
     # choosing top module as non-callable module
+    count_top = 0
     for mod in module_list:
-        if not mod.called and len(mod.attachments) == max_att:
+        if not mod.called and mod.count_att == max_att:
             top_module_name = mod.name
             count_top += 1
 

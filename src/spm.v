@@ -3,7 +3,7 @@ module spm (clk, rst, x, y, p);
     parameter size = 32;
 	parameter size_mini = 4;
 	//parameter size_fatal = size ^ 1;
-	parameter size_left = size << 15;
+	parameter size_left = size << 10;
 	parameter size_right = size >> size_mini;
 	parameter size_plus = size + size;
 	parameter size_minus = size - size_mini;
@@ -31,7 +31,10 @@ module spm (clk, rst, x, y, p);
 
 endmodule
 
-module TCMP(clk, rst, a, s);
+blablabla1
+
+module TCMP
+(clk, rst, a, s);
 	parameter TCMP_size1 = 111;
 	parameter TCMP_size2 = 222;
 	parameter TCMP_size3 = 333;
@@ -56,7 +59,11 @@ module TCMP(clk, rst, a, s);
     end
 endmodule
 
-module CSADD(clk, rst, x, y, sum);
+blablabla2
+
+module
+ CSADD
+ (clk, rst, x, y, sum);
     input clk, rst;
     input x, y;
     output reg sum;

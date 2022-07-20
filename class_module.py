@@ -1,3 +1,4 @@
+
 class Module:
     def __init__(self, name=''):
         self.name = name
@@ -42,11 +43,9 @@ class Module:
         self.params.append(param)
 
     def append_pin(self, pin):
-        if pin.direction == 'input':
-            self.pins.append(pin)
-        elif pin.direction == 'output':
-            self.pins.append(pin)
-        elif pin.direction == 'inout':
+        if pin.direction == 'input' or \
+            pin.direction == 'output' or \
+            pin.direction == 'inout':
             self.pins.append(pin)
         else:
             print('fatal: wrong type of pin %s' % pin.name)
@@ -58,6 +57,7 @@ class Module_for_search():
         self.attachments = []
         self.called = False
         self.count_att = 0
+        self.text = ''
 
 
 
