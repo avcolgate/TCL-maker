@@ -26,10 +26,13 @@ def main():
         if MANUAL:
             if len(sys.argv) > 2:
                 module_name = sys.argv[2]
+                module_body = lines
             else:
                 print('fatal: module name is not specified')
                 exit()
         else:
+            if len(sys.argv) > 2:
+                print('warning: module name is not necessary in AUTOMATIC mode. It will be chosen automatically\n')
             top_module = get_module_name(lines)
             module_name = top_module.name
             module_body = top_module.text_arr

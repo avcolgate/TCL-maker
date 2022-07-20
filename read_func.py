@@ -425,9 +425,7 @@ def read_section_pins(line, param_list, pin_list, line_num):
 # two or more non-callable modules. Top module will be chosen as module with the most attachments
 def get_module_name(lines):
     top_module_name = 'NaN'
-    names = []
     module_list = []
-    attachments_list = []
 
     # collecting module names and it's content
     module_fs = Module_for_search() #TODO можно без создания объекта?
@@ -440,6 +438,7 @@ def get_module_name(lines):
         if ('module' in line or 'macromodule' in line) and not 'endmodule' in line:
             module_fs = Module_for_search()
             temp_name = ''
+            start_line = line_num
 
         temp_line = line.strip()
         module_fs.text += temp_line + ' '
@@ -452,10 +451,14 @@ def get_module_name(lines):
                 temp_name = temp_name.replace('module', '')
                 temp_name = re.sub('[;| ]', '', temp_name)
                 module_fs.name = temp_name
-                names.append(temp_name)
                 temp_name = ''
 
         if 'endmodule' in temp_line:
+            for mod in module_list:
+                if mod.name == module_fs.name:
+                    print("fatal: duplicate module name '%s', line %i" % (module_fs.name, start_line + 1))
+                    exit() 
+
             module_list.append(module_fs)
             module_fs = Module_for_search()
     
