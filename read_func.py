@@ -33,7 +33,7 @@ def read_section_params(line, param_list, line_num):
 
     for par in param_list:
         if par.name == temp_name:
-            print("fatal: duplicate parameter '%s', line %i" % (temp_name, line_num + 1))
+            print("fatal: duplicate parameter '%s', line %i\n" % (temp_name, line_num + 1))
             exit()
 
     # * parametric size of parameter
@@ -63,17 +63,17 @@ def read_section_params(line, param_list, line_num):
 
             # check if every parameter is a number now
             if check < 2:
-                print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()
 
             if str(val_left).isdigit() and str(val_right).isdigit():
                 if int(val_right) > 20:
-                    print("fatal: the argument is too large. Parameter '%s', line %i" % (temp_name, line_num + 1))
+                    print("fatal: the argument is too large. Parameter '%s', line %i\n" % (temp_name, line_num + 1))
                     exit()
                 else:
                     temp_size = int(val_left) << int(val_right)
             else:
-                print("fatal: arguments in '<<' operation must be positive integer. Parameter '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: arguments in '<<' operation must be positive integer. Parameter '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()
 
         elif '>>' in temp_expr:
@@ -99,13 +99,13 @@ def read_section_params(line, param_list, line_num):
                 check += 1
 
             if check < 2:
-                print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()
 
             if str(val_left).isdigit() and str(val_right).isdigit():
                 temp_size = int(val_left) >> int(val_right)
             else:
-                print("fatal: arguments in '>>' operation must be positive integer. Parameter '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: arguments in '>>' operation must be positive integer. Parameter '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()
             
         elif '+' in temp_expr:
@@ -131,13 +131,13 @@ def read_section_params(line, param_list, line_num):
                 check += 1
 
             if check < 2:
-                print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()
 
             if str(val_left).isdigit() and str(val_right).isdigit():
                 temp_size = int(val_left) + int(val_right)
             else:
-                print("fatal: arguments in '+' must be positive integer. Parameter '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: arguments in '+' must be positive integer. Parameter '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()    
 
         elif '-' in temp_expr:
@@ -163,13 +163,13 @@ def read_section_params(line, param_list, line_num):
                 check += 1
 
             if check < 2:
-                print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()
 
             if str(val_left).isdigit() and str(val_right).isdigit():
                 temp_size = int(val_left) - int(val_right)
             else:
-                print("fatal: arguments in '-' must be positive integer. Parameter '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: arguments in '-' must be positive integer. Parameter '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()
 
         elif '*' in temp_expr:
@@ -195,13 +195,13 @@ def read_section_params(line, param_list, line_num):
                 check += 1
 
             if check < 2:
-                print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()
 
             if str(val_left).isdigit() and str(val_right).isdigit():
                 temp_size = int(val_left) * int(val_right)
             else:
-                print("fatal: arguments in '*' must be positive integer. Parameter '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: arguments in '*' must be positive integer. Parameter '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()
 
         elif '/' in temp_expr:
@@ -227,21 +227,21 @@ def read_section_params(line, param_list, line_num):
                 check += 1
 
             if check < 2:
-                print("fatal: unknown parameter in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()
 
             if str(val_left).isdigit() and str(val_right).isdigit():
                 if int(val_left) % int(val_right) == 0:
                     temp_size = int(int(val_left) / int(val_right))
                 else:
-                    print("fatal: parameter '%s' must be positive integer, line %i" % (temp_name, line_num + 1))
+                    print("fatal: parameter '%s' must be positive integer, line %i\n" % (temp_name, line_num + 1))
                     exit()
             else:
-                print("fatal: unknown expression in size of parameter '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: unknown expression in size of parameter '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()
 
         else:
-            print('fatal: unknown expression in parameter value %s, line %i' % (temp_name, line_num + 1))
+            print("fatal: unknown expression in parameter value %s, line %i\n" % (temp_name, line_num + 1))
             exit()
     
     # * simple parameter size
@@ -252,7 +252,7 @@ def read_section_params(line, param_list, line_num):
         param.name =  temp_name
         param.value = int(temp_size)
     else:
-        print("fatal: parameter '%s' must be positive integer and less than 100000, line %i" % (temp_name, line_num + 1))
+        print("fatal: parameter '%s' must be positive integer and less than 100000, line %i\n" % (temp_name, line_num + 1))
         exit()
     
     return param
@@ -290,7 +290,7 @@ def read_section_pins(line, param_list, pin_list, line_num):
     for pin in pin_list:
         for name in temp_name_arr:
             if pin.name == name:
-                print("fatal: duplicate pin name '%s', line %i" % (name, line_num + 1))
+                print("fatal: duplicate pin name '%s', line %i\n" % (name, line_num + 1))
                 exit()    
 
     # * parametric size
@@ -337,16 +337,16 @@ def read_section_pins(line, param_list, pin_list, line_num):
                 check += 1
 
             if check < 2:
-                print("fatal: unknown parameter in pin size, line %i" % (line_num + 1))
+                print("fatal: unknown parameter in pin size, line %i\n" % (line_num + 1))
                 exit()
             
             if str(start_val_left).isdigit() and str(start_val_right).isdigit():
                 start_val = int(start_val_left) + k * int(start_val_right) 
                 if start_val < 0:
-                    print("fatal: arguments in size must be !positive integer. Pin '%s', line %i" % (temp_name, line_num + 1))
+                    print("fatal: arguments in size must be !positive integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
                     exit()
             else:
-                print("fatal: arguments in size must be positive !integer. Pin '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: arguments in size must be positive !integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()
 
         if not is_number(end_val):  # if parameter in RIGHT part
@@ -385,25 +385,29 @@ def read_section_pins(line, param_list, pin_list, line_num):
                 check += 1
 
             if check < 2:
-                print("fatal: unknown parameter in pin size, line %i" % (line_num + 1))
+                print("fatal: unknown parameter in pin size, line %i\n" % (line_num + 1))
                 exit()
 
             if str(start_val_left).isdigit() and str(start_val_right).isdigit():
                 end_val = int(end_val_left) + k * int(end_val_right)
                 if end_val < 0:
-                    print("fatal: arguments in size must be !positive integer. Pin '%s', line %i" % (temp_name, line_num + 1))
+                    print("fatal: arguments in size must be !positive integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
                     exit()
             else:
-                print("fatal: arguments in size must be positive !integer. Pin '%s', line %i" % (temp_name, line_num + 1))
+                print("fatal: arguments in size must be positive !integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()
 
+        if int(start_val) < 0 or int(end_val) < 0:
+            print("fatal: limits must be positive integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
+            exit()
+
         if start_val == end_val:
-            print("warning: equal limits in the pin size. Pin '%s', line %i" % (temp_name, line_num + 1))
+            print("warning: equal limits in the pin size. Pin '%s', line %i\n" % (temp_name, line_num + 1))
 
         pin_true_size = int(start_val) - int(end_val) + 1
 
         if pin_true_size < 1:
-            print("fatal: pin size must be positive integer. Pin '%s', line %i" % (temp_name, line_num + 1))
+            print("fatal: pin size must be positive integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
             exit()
 
     # * simple size (=1)
@@ -423,7 +427,7 @@ def read_section_pins(line, param_list, pin_list, line_num):
 # two or more modules modules have the maximum number of attachments
 #* warning:
 # two or more non-callable modules. Top module will be chosen as module with the most attachments
-def get_module_name(lines):
+def get_top_module(lines):
     top_module_name = 'NaN'
     module_list = []
 
@@ -456,14 +460,14 @@ def get_module_name(lines):
         if 'endmodule' in temp_line:
             for mod in module_list:
                 if mod.name == module_fs.name:
-                    print("fatal: duplicate module name '%s', line %i" % (module_fs.name, start_line + 1))
+                    print("fatal: duplicate module name '%s', line %i\n" % (module_fs.name, start_line + 1))
                     exit() 
 
             module_list.append(module_fs)
             module_fs = Module_for_search()
     
     if not module_list:
-        print('fatal: no modules in file')
+        print('fatal: no modules in file\n')
         exit()
 
 
@@ -485,7 +489,7 @@ def get_module_name(lines):
                 max_att = mod.count_att
 
     if count_non_callable > 1:
-        print('warning: there are two or more non-callable modules. Top module will be chosen as module with the most attachments')
+        print('warning: there are two or more non-callable modules. Top module will be chosen as module with the most attachments\n')
 
 
     # choosing top module as non-callable module
@@ -496,7 +500,7 @@ def get_module_name(lines):
             count_top += 1
 
     if count_top > 1:
-        print('fatal: there are two or more non-callable modules modules have the maximum number of attachments')
+        print('fatal: there are two or more non-callable modules modules have the maximum number of attachments\n')
         exit()
 
     return top_module_name
