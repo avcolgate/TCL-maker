@@ -17,10 +17,12 @@ def main():
     else:
         print('fatal: input file does not exist')
         exit()
+        
+    module = Module()
 
     with open(file=path, mode='rt') as file:
         is_module_section = False
-        module = Module()
+        
         lines = file.read().split('\n')
 
         if MANUAL:
@@ -69,7 +71,7 @@ def main():
                     is_module_section = False
                     break
 
-        module.print()
+    module.print()
 
 
 if __name__ == "__main__":

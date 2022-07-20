@@ -17,7 +17,7 @@ class Module:
 
         print("Parameters [%i]:" % len(self.pins))
         for param in self.params:
-            print('%s = %i' % (param.name, param.value))
+            print('%10s = %5i' % (param.name, param.value))
         print('')
 
         print("Pins [%i]:" % len(self.pins))

@@ -6,7 +6,8 @@ class Line:
         self.content = content
     
     def erase_comment(self):
-        self.content = self.content[:self.content.find('//')]
+        if '//' in self.content:
+            self.content = self.content[:self.content.find('//')]
         return True
 
     def is_name_section(self, module_name, module_body, line_num):
