@@ -25,7 +25,7 @@ def read_section_name(line):  # ? delete??
 def read_section_params(line, param_list, line_num):
     param = Param()
 
-    temp = line.content
+    temp = line.content.replace('\t', ' ')
     temp = temp.replace('parameter', '')
     temp = re.sub("[;| |\t|,]", "", temp)
     
@@ -272,14 +272,14 @@ def read_section_pins(line, param_list, pin_list, line_num):
     pin_direction = 'NaN'
     k = 1
 
-    temp = line.content.strip()
+    temp = line.content.strip().replace('\t', ' ')
 
     temp_direction_name = re.sub(r'\[[^()]*\]', '', temp) # substracting size
 
     pin_direction = temp_direction_name[:temp_direction_name.find(' ')] # input | output | inout
 
     pin_size = temp[temp.find('['):temp.find(']') + 1] # [...]
-
+    
     temp_name = temp_direction_name.replace(pin_direction, '')
     temp_name = temp_name.replace('reg', '').replace('wire', '') #? also delete SystemVerilog's 'logic'?
     temp_name = re.sub("[;| |\t]", "", temp_name) # name1,name2,..
@@ -436,6 +436,7 @@ def get_top_module(lines):
     temp_name = ''
 
     for line_num, line in enumerate(lines):
+        line = line.replace('\t', ' ')
         if '//' in line:
             line = line[:line.find('//')]
 
