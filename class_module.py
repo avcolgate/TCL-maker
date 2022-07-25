@@ -49,6 +49,7 @@ class Module:
             self.pins.append(pin)
         else:
             print('fatal: wrong type of pin %s' % pin.name)
+            exit()
 
 
 class Module_for_search():
