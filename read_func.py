@@ -19,7 +19,7 @@ def read_section_name(line):  # ? delete??
 # negative values in define size
 # float values in define size
 # too large define size
-def append_defines(lines, module): #! fatals and warnings
+def append_defines(lines, module):
 
     for line_num, curr_line in enumerate(lines):
         line = Line(curr_line)
