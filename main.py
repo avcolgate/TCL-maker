@@ -18,12 +18,14 @@ def main():
         print('fatal: input file does not exist')
         exit()
         
-    module = Module()
 
     with open(file=path, mode='rt') as file:
+        module = Module()
         is_module_section = False
         
         lines = file.read().split('\n')
+
+        append_defines(lines, module)
 
         if MANUAL:
             if len(sys.argv) > 2:

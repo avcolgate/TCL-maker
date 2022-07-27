@@ -1,3 +1,4 @@
+from statistics import mode
 from class_module import *
 from class_line import *
 from func import *
@@ -11,6 +12,43 @@ def read_section_name(line):  # ? delete??
         name = temp[temp.find('module') + len('module') + 1:]
 
     return name
+
+
+# * fatals: 
+# duplicate name
+# negative values in define size
+# float values in define size
+# too large define size
+def append_defines(lines, module): #! fatals and warnings
+
+    for line_num, curr_line in enumerate(lines):
+        line = Line(curr_line)
+        line.erase_comment()
+        if line.is_define_section():
+            param = Param()
+            temp = line.content.replace('\t', ' ')
+
+            temp = temp.replace('`define', '')
+            temp = re.sub("[;|\t|,]", "", temp).strip()
+            temp_name, temp_size = temp.split(' ')
+
+            if str(temp_size).isdigit() and int(temp_size) > 0 and int(temp_size) < 100000:
+                param.name = '`' + temp_name
+                param.value = int(temp_size)
+            else:
+                print("fatal: parameter '%s' must be positive integer and less than 100000, line %i\n" % (temp_name, line_num + 1))
+                exit()
+
+            for par in module.params:
+                if par.name == param.name:
+                    print("fatal: duplicate parameter '%s', line %i\n" % (temp_name, line_num + 1))
+                    exit()
+
+            module.append_params(param)
+            continue
+
+        elif line.is_module_section():
+            break
 
 
 # * fatals: 

@@ -26,6 +26,11 @@ class Line:
             return True
         return False
 
+    def is_define_section(self):
+        if '`define' in self.content:
+            return True
+        return False
+
     def is_param_section(self):
         if 'parameter' in self.content:
             return True
@@ -38,5 +43,10 @@ class Line:
 
     def is_endmodule_section(self):
         if 'endmodule' in self.content:
+            return True
+        return False
+
+    def is_module_section(self):
+        if 'module' in self.content:
             return True
         return False
