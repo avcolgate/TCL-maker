@@ -31,19 +31,18 @@ def main():
             if len(sys.argv) > 2:
                 specified_name = sys.argv[2]
                 top_module = get_top_module(lines, specified_name)
-                
-                module_name = top_module.name
-                module_body = top_module.text_arr
             else:
                 print('fatal: module name is not specified')
                 exit()
+
+        #* AUTOMATIC
         else:
             if len(sys.argv) > 2:
                 print('warning: module name is not necessary in AUTOMATIC mode. It will be chosen automatically\n')
             top_module = get_top_module(lines)
-            module_name = top_module.name
-            module_body = top_module.text_arr
 
+        module_name = top_module.name
+        module_body = top_module.text_arr
 
         for line_num, curr_line in enumerate(module_body): # TODO сделать отдельную функцию
             line = Line(curr_line)

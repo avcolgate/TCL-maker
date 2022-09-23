@@ -563,13 +563,12 @@ def get_top_module(lines, specified_name = ''):
         print('fatal: no modules in file\n')
         exit()
 
+    # MANUAL mode: return module with specified name
     if specified_name:
         for mod in module_list:
             if mod.name == specified_name:
                 top_module = mod
-
                 return top_module
-
 
     # searching attachmnets in each module
     for mod in module_list:
