@@ -506,8 +506,8 @@ def read_section_pins(line, param_list, define_list, pin_list, line_num):
 # duplicate module name
 # two or more modules modules have the maximum number of attachments
 # two or more non-callable modules
-def get_top_module(lines):
-    top_module_name = 'NaN'
+def get_top_module(lines, specified_name = ''):
+    top_module = 'NaN'
     module_list = []
 
     # collecting module names and it's content
@@ -563,6 +563,13 @@ def get_top_module(lines):
         print('fatal: no modules in file\n')
         exit()
 
+    if specified_name:
+        for mod in module_list:
+            if mod.name == specified_name:
+                top_module = mod
+
+                return top_module
+
 
     # searching attachmnets in each module
     for mod in module_list:
@@ -590,11 +597,11 @@ def get_top_module(lines):
     count_top = 0
     for mod in module_list:
         if not mod.called and mod.attach_num == max_att:
-            top_module_name = mod
+            top_module = mod
             count_top += 1
 
     if count_top > 1:
         print('fatal: there are two or more non-callable modules modules have the maximum number of attachments\n')
         exit()
 
-    return top_module_name
+    return top_module
