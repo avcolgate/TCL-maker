@@ -30,7 +30,7 @@ def main():
         if MANUAL:
             if len(sys.argv) > 2:
                 module_name = sys.argv[2]
-                module_body = lines
+                module_body = lines #!!! так быть не должно -- идет проверка по всему файлу
             else:
                 print('fatal: module name is not specified')
                 exit()
@@ -63,7 +63,7 @@ def main():
 
                 if line.is_pin_section():
                     # print(line.content)
-                    pin_arr = read_section_pins(line, module.params, module.pins, line_num)
+                    pin_arr = read_section_pins(line, module.params, module.defines, module.pins, line_num)
                     for pin in pin_arr:
                         module.append_pin(pin)
                     continue

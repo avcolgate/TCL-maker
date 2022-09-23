@@ -1,4 +1,3 @@
-from statistics import mode
 from class_module import *
 from class_line import *
 from func import *
@@ -16,6 +15,8 @@ def read_section_name(line):  # ? delete??
 
 # * fatals: 
 # duplicate name
+# bad name
+# no value 
 # negative values in define size
 # float values in define size
 # too large define size
@@ -25,26 +26,35 @@ def append_defines(lines, module):
         line = Line(curr_line)
         line.erase_comment()
         if line.is_define_section():
-            param = Param()
+            define = Define()
             temp = line.content.replace('\t', ' ')
 
             temp = temp.replace('`define', '')
             temp = re.sub("[;|\t|,]", "", temp).strip()
-            temp_name, temp_size = temp.split(' ')
+
+            if ' ' in temp:
+                temp_name, temp_size = temp.split(' ')
+            else:
+               print("fatal: bad define, line %i\n" % (line_num + 1))
+               exit()
 
             if str(temp_size).isdigit() and int(temp_size) > 0 and int(temp_size) < 100000:
-                param.name = '`' + temp_name
-                param.value = int(temp_size)
+                define.name = temp_name
+                define.value = int(temp_size)
             else:
-                print("fatal: parameter '%s' must be positive integer and less than 100000, line %i\n" % (temp_name, line_num + 1))
+                print("fatal: define '%s' must be positive integer and less than 100000, line %i\n" % (temp_name, line_num + 1))
                 exit()
 
-            for par in module.params:
-                if par.name == param.name:
-                    print("fatal: duplicate parameter '%s', line %i\n" % (temp_name, line_num + 1))
+            for d in module.defines:
+                if d.name == define.name:
+                    print("fatal: duplicate define '%s', line %i\n" % (temp_name, line_num + 1))
                     exit()
 
-            module.append_params(param)
+            if not is_good_name(define.name):
+                print("fatal: bad define name '%s', line %i\n" % (temp_name, line_num + 1))
+                exit()
+
+            module.append_defines(define)
             continue
 
         elif line.is_module_section():
@@ -67,12 +77,20 @@ def read_section_params(line, param_list, line_num):
     temp = temp.replace('parameter', '')
     temp = re.sub("[;| |\t|,]", "", temp)
     
-    temp_name, temp_expr = temp.split('=')
+    if '=' in temp:
+        temp_name, temp_expr = temp.split('=')
+    else:
+        print("fatal: bad define, line %i\n" % (line_num + 1))
+        exit()
 
     for par in param_list:
         if par.name == temp_name:
             print("fatal: duplicate parameter '%s', line %i\n" % (temp_name, line_num + 1))
             exit()
+
+    if not is_good_name(temp_name):
+        print("fatal: bad parameter name '%s', line %i\n" % (temp_name, line_num + 1))
+        exit()
 
     # * parametric size of parameter
     if not is_number(temp_expr):
@@ -305,7 +323,7 @@ def read_section_params(line, param_list, line_num):
 # float pin size
 # * warnings:
 # equal limits in pin size
-def read_section_pins(line, param_list, pin_list, line_num):
+def read_section_pins(line, param_list, define_list, pin_list, line_num):
     pin_arr = []
     pin_direction = 'NaN'
     k = 1
@@ -329,7 +347,11 @@ def read_section_pins(line, param_list, pin_list, line_num):
         for name in temp_name_arr:
             if pin.name == name:
                 print("fatal: duplicate pin name '%s', line %i\n" % (name, line_num + 1))
-                exit()    
+                exit()   
+    #!!!
+    # if pin.name in keyword_list:
+    #     print("fatal: pin name '%s' must not be a keyword, line %i\n" % (temp_name, line_num + 1))
+    #     exit()
 
     # * parametric size
     if pin_size:
@@ -362,6 +384,11 @@ def read_section_pins(line, param_list, pin_list, line_num):
                         start_val_left = param.value
                         check += 1
                         break
+                for define in define_list:
+                    if '`' + define.name == start_val_left:
+                        start_val_left = define.value
+                        check += 1
+                        break
             else:
                 check += 1
 
@@ -369,6 +396,11 @@ def read_section_pins(line, param_list, pin_list, line_num):
                 for param in param_list:
                     if param.name == start_val_right:
                         start_val_right = param.value
+                        check += 1
+                        break
+                for define in define_list:
+                    if '`' + define.name == start_val_right:
+                        start_val_right = define.value
                         check += 1
                         break
             else:
@@ -410,6 +442,11 @@ def read_section_pins(line, param_list, pin_list, line_num):
                         end_val_left = param.value
                         check += 1
                         break
+                for define in define_list:
+                    if '`' + define.name == end_val_left:
+                        end_val_left = define.value
+                        check += 1
+                        break
             else:
                 check += 1
 
@@ -417,6 +454,11 @@ def read_section_pins(line, param_list, pin_list, line_num):
                 for param in param_list:
                     if param.name == end_val_right:
                         end_val_right = param.value
+                        check += 1
+                        break
+                for define in define_list:
+                    if '`' + define.name == end_val_right:
+                        end_val_right = define.value
                         check += 1
                         break
             else:
@@ -463,8 +505,7 @@ def read_section_pins(line, param_list, pin_list, line_num):
 # no modules in file
 # duplicate module name
 # two or more modules modules have the maximum number of attachments
-#* warning:
-# two or more non-callable modules. Top module will be chosen as module with the most attachments
+# two or more non-callable modules
 def get_top_module(lines):
     top_module_name = 'NaN'
     module_list = []
@@ -472,20 +513,33 @@ def get_top_module(lines):
     # collecting module names and it's content
     module_fs = Module_for_search() #TODO можно без создания объекта?
     temp_name = ''
+    is_module_section = False
 
+    # collecting bodies of each module
     for line_num, line in enumerate(lines):
+        
+        line = skip_comment(line)
         line = line.replace('\t', ' ')
-        if '//' in line:
-            line = line[:line.find('//')]
+        if line == '' or line == ' ' or '`define' in line:
+            continue
 
-        if ('module' in line or 'macromodule' in line) and not 'endmodule' in line:
-            module_fs = Module_for_search()
-            temp_name = ''
-            start_line = line_num
+        # outside module section -- searching start line of a module
+        if not is_module_section:
+            if ('module' in line or 'macromodule' in line) \
+            and not 'endmodule' in line:
 
-        temp_line = line.strip()
-        module_fs.text += temp_line + ' '
-        module_fs.text_arr.append(temp_line)
+                module_fs = Module_for_search()
+                temp_name = '' #? DELETE
+                start_line = line_num
+                is_module_section = True
+            else:
+                continue
+
+        # inside module section -- adding each line
+        if is_module_section:
+            temp_line = line.strip()
+            module_fs.text += temp_line + ' ' #? DELETE??
+            module_fs.text_arr.append(temp_line)
 
         if not module_fs.name:
             temp_name += temp_line + ' '
@@ -496,14 +550,14 @@ def get_top_module(lines):
                 module_fs.name = temp_name
                 temp_name = ''
 
-        if 'endmodule' in temp_line:
+        if is_module_section and 'endmodule' in line:
             for mod in module_list:
                 if mod.name == module_fs.name:
                     print("fatal: duplicate module name '%s', line %i\n" % (module_fs.name, start_line + 1))
                     exit() 
 
+            is_module_section = False
             module_list.append(module_fs)
-            module_fs = Module_for_search()
     
     if not module_list:
         print('fatal: no modules in file\n')
@@ -515,7 +569,7 @@ def get_top_module(lines):
         for submod in module_list:
             if submod.name in mod.text and submod.name != mod.name and submod.name not in mod.attachments:
                 mod.attachments.append(submod.name)
-                mod.count_att += 1
+                mod.attach_num += 1
                 submod.called = True
     
     max_att = -1
@@ -524,17 +578,18 @@ def get_top_module(lines):
         if not mod.called:
             count_non_callable += 1
             # print(mod.name)
-            if mod.count_att > max_att:
-                max_att = mod.count_att
+            if mod.attach_num > max_att:
+                max_att = mod.attach_num
 
     if count_non_callable > 1:
-        print('warning: there are two or more non-callable modules. Top module will be chosen as module with the most attachments\n')
+        print('fatal: there are two or more non-callable modules\n')
+        exit()
 
 
     # choosing top module as non-callable module
     count_top = 0
     for mod in module_list:
-        if not mod.called and mod.count_att == max_att:
+        if not mod.called and mod.attach_num == max_att:
             top_module_name = mod
             count_top += 1
 

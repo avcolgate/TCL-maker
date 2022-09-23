@@ -3,10 +3,8 @@ class Module:
     def __init__(self, name=''):
         self.name = name
         self.params = []
+        self.defines = []
         self.pins = []
-        # self.inputs = []
-        # self.outputs = []
-        # self.inouts = []
 
     def print(self):
         if self.name == '':
@@ -14,6 +12,11 @@ class Module:
             return
         else:
             print('Module: %s\n' % self.name)
+
+        print("Defines [%i]:" % len(self.defines))
+        for define in self.defines:
+            print('%10s = %i' % (define.name, define.value))
+        print('')
 
         print("Parameters [%i]:" % len(self.params))
         for param in self.params:
@@ -42,6 +45,9 @@ class Module:
     def append_params(self, param):
         self.params.append(param)
 
+    def append_defines(self, define):
+        self.defines.append(define)
+
     def append_pin(self, pin):
         if pin.direction == 'input' or \
             pin.direction == 'output' or \
@@ -57,7 +63,7 @@ class Module_for_search():
         self.name = name
         self.attachments = []
         self.called = False
-        self.count_att = 0
+        self.attach_num = 0
         self.text = ''
         self.text_arr = []
 
@@ -76,6 +82,11 @@ class Pin:
 
 
 class Param:
+    def __init__(self, name='', value=0):
+        self.name = name
+        self.value = value
+
+class Define:
     def __init__(self, name='', value=0):
         self.name = name
         self.value = value

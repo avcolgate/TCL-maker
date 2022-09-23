@@ -1,13 +1,14 @@
 import re
 
+from func import skip_comment
+
 
 class Line:
     def __init__(self, content=''):
         self.content = content
     
     def erase_comment(self):
-        if '//' in self.content:
-            self.content = self.content[:self.content.find('//')]
+        self.content = skip_comment(self.content)
         return True
 
     def is_name_section(self, module_name, module_body, line_num):
