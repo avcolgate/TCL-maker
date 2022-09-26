@@ -9,15 +9,15 @@ def main():
     print('MANUAL MODE\n') if MANUAL else print('AUTOMATIC MODE\n')
 
     if len(sys.argv) < 2:
-        print('fatal: the path is not specified')
+        print('fatal: the path is not specified\n')
         exit()
     elif os.path.exists(sys.argv[1]):
         path = sys.argv[1].replace('\\', '/')
         if os.stat(path).st_size == 0:
-            print('fatal: input file is empty')
+            print('fatal: input file is empty\n')
             exit() 
     else:
-        print('fatal: input file does not exist')
+        print('fatal: input file does not exist\n')
         exit()
         
 
@@ -30,12 +30,20 @@ def main():
         append_defines(lines, module)
 
         if MANUAL:
+            # module name is specified
             if len(sys.argv) > 2:
                 specified_name = sys.argv[2]
-                top_module = get_top_module(lines, specified_name)
+                if not is_good_name(specified_name):
+                    print("fatal: bad specified module name '%s'\n" % (specified_name))
+                    exit()
+                else:
+                    top_module = get_top_module(lines, specified_name)
+
+            # module name is not specified   
             else:
-                print('fatal: module name is not specified')
+                print('fatal: module name is not specified\n')
                 exit()
+
         #* AUTOMATIC
         else:
             if len(sys.argv) > 2:
