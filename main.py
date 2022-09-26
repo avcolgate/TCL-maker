@@ -3,7 +3,6 @@ import sys
 
 from read_func import *
 
-
 MANUAL = True
 
 def main():
@@ -14,6 +13,9 @@ def main():
         exit()
     elif os.path.exists(sys.argv[1]):
         path = sys.argv[1].replace('\\', '/')
+        if os.stat(path).st_size == 0:
+            print('fatal: input file is empty')
+            exit() 
     else:
         print('fatal: input file does not exist')
         exit()
@@ -34,7 +36,6 @@ def main():
             else:
                 print('fatal: module name is not specified')
                 exit()
-
         #* AUTOMATIC
         else:
             if len(sys.argv) > 2:
@@ -43,6 +44,7 @@ def main():
 
         module_name = top_module.name
         module_body = top_module.text_arr
+
 
         for line_num, curr_line in enumerate(module_body): # TODO сделать отдельную функцию
             line = Line(curr_line)

@@ -48,6 +48,6 @@ class Line:
         return False
 
     def is_module_section(self):
-        if 'module' in self.content:
+        if 'module' in self.content and not 'endmodule' in self.content:
             return True
         return False

@@ -17,20 +17,18 @@ def read_section_name(line):  # ? delete??
 # duplicate name
 # bad name
 # no value 
-# negative values in define size
-# float values in define size
-# too large define size
+# bad values in define size (only unsigned integer < 100 000)
 def append_defines(lines, module):
 
     for line_num, curr_line in enumerate(lines):
         line = Line(curr_line)
         line.erase_comment()
+
         if line.is_define_section():
             define = Define()
             temp = line.content.replace('\t', ' ')
 
-            temp = temp.replace('`define', '')
-            temp = re.sub("[;|\t|,]", "", temp).strip()
+            temp = temp.replace('`define', '').strip()
 
             if ' ' in temp:
                 temp_name, temp_size = temp.split(' ')
@@ -39,10 +37,10 @@ def append_defines(lines, module):
                exit()
 
             if str(temp_size).isdigit() and int(temp_size) > 0 and int(temp_size) < 100000:
-                define.name = temp_name
+                define.name = str(temp_name)
                 define.value = int(temp_size)
             else:
-                print("fatal: define '%s' must be positive integer and less than 100000, line %i\n" % (temp_name, line_num + 1))
+                print("fatal: define '%s' must be positive integer, line %i\n" % (temp_name, line_num + 1))
                 exit()
 
             for d in module.defines:
@@ -308,7 +306,7 @@ def read_section_params(line, param_list, line_num):
         param.name =  temp_name
         param.value = int(temp_size)
     else:
-        print("fatal: parameter '%s' must be positive integer and less than 100000, line %i\n" % (temp_name, line_num + 1))
+        print("fatal: parameter '%s' must be positive integer, line %i\n" % (temp_name, line_num + 1))
         exit()
     
     return param
@@ -604,3 +602,4 @@ def get_top_module(lines, specified_name = ''):
         exit()
 
     return top_module
+    
