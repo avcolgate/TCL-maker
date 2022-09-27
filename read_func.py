@@ -506,10 +506,10 @@ def read_section_pins(line, param_list, define_list, pin_list, line_num):
 # two or more non-callable modules
 # two or more modules modules have the maximum number of attachments
 def get_top_module(lines, specified_name = ''):
-    top_module = 'NaN'
-    found_specified = False
     module_list = []
-
+    top_module = Module()
+    found_specified = False
+         
     # collecting module names and it's content
     module_fs = Module_for_search() #TODO можно без создания объекта?
     temp_name = ''
@@ -529,7 +529,7 @@ def get_top_module(lines, specified_name = ''):
             and not 'endmodule' in line:
 
                 module_fs = Module_for_search()
-                temp_name = '' #? DELETE
+                temp_name = ''
                 start_line = line_num
                 is_module_section = True
             else:
@@ -538,11 +538,14 @@ def get_top_module(lines, specified_name = ''):
         # inside module section -- adding each line
         if is_module_section:
             temp_line = line.strip()
-            module_fs.text += temp_line + ' ' #? DELETE??
+            module_fs.text += temp_line + ' '
             module_fs.text_arr.append(temp_line)
 
+        # getting module name
         if not module_fs.name:
             temp_name += temp_line + ' '
+
+            # ';' is end of module string
             if ';' in temp_line:
                 temp_name = re.sub(r'\([^()]*\)', '', temp_name)
                 temp_name = temp_name.replace('module', '')
@@ -563,21 +566,20 @@ def get_top_module(lines, specified_name = ''):
         print('fatal: no modules in file\n')
         exit()
 
-    # MANUAL mode: return module with specified name
+    #* MANUAL mode: return module with specified name
     if specified_name:
         for mod in module_list:
             if mod.name == specified_name:
                 found_specified = True
                 top_module = mod
+                return top_module
 
-        if found_specified:
-            return top_module
-        else:
+        if not found_specified:
             print("fatal: specified module '%s' not found\n" % (specified_name))
             exit() 
 
-
-    # searching attachmnets in each module
+    #* AUTOMATIC mode: define top module
+    # searching attachments in each module
     for mod in module_list:
         for submod in module_list:
             if submod.name in mod.text and submod.name != mod.name and submod.name not in mod.attachments:
