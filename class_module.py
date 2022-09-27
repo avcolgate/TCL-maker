@@ -64,6 +64,7 @@ class Module_for_search():
         self.attachments = []
         self.called = False
         self.attach_num = 0
+        self.offset = 0
         self.text = ''
         self.text_arr = []
 

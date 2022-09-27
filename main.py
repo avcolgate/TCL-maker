@@ -52,6 +52,7 @@ def main():
 
         module_name = top_module.name
         module_body = top_module.text_arr
+        module_offset = top_module.offset + 1
 
 
         for line_num, curr_line in enumerate(module_body): # TODO сделать отдельную функцию
@@ -69,13 +70,13 @@ def main():
             else:
                 if line.is_param_section():
                     # print(line.content)
-                    param = read_section_params(line, module.params, line_num)
+                    param = read_section_params(line, module.params, line_num + module_offset)
                     module.append_params(param)
                     continue
 
                 if line.is_pin_section():
                     # print(line.content)
-                    pin_arr = read_section_pins(line, module.params, module.defines, module.pins, line_num)
+                    pin_arr = read_section_pins(line, module.params, module.defines, module.pins, line_num + module_offset)
                     for pin in pin_arr:
                         module.append_pin(pin)
                     continue

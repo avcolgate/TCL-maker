@@ -507,6 +507,7 @@ def read_section_pins(line, param_list, define_list, pin_list, line_num):
 # two or more modules modules have the maximum number of attachments
 def get_top_module(lines, specified_name = ''):
     module_list = []
+    module_offset = 0
     top_module = Module()
     found_specified = False
          
@@ -520,7 +521,7 @@ def get_top_module(lines, specified_name = ''):
         
         line = skip_comment(line)
         line = line.replace('\t', ' ')
-        if line == '' or line == ' ' or '`define' in line:
+        if line == ' ' or '`define' in line:
             continue
 
         # outside module section -- searching start line of a module
@@ -531,6 +532,7 @@ def get_top_module(lines, specified_name = ''):
                 module_fs = Module_for_search()
                 temp_name = ''
                 start_line = line_num
+                module_fs.offset = line_num
                 is_module_section = True
             else:
                 continue
