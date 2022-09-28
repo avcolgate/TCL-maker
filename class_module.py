@@ -39,7 +39,7 @@ class Module:
     def append_name(self, name):
         self.name = name
 
-    def append_params(self, param):
+    def append_param(self, param):
         self.params.append(param)
 
     def append_defines(self, define):

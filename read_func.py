@@ -509,7 +509,7 @@ def get_top_module(lines, specified_name = ''):
     module_list = []
     top_module = Module()
     found_specified = False
-         
+
     # collecting module names and it's content
     module_fs = Module_for_search() #TODO можно без создания объекта?
     temp_name = ''
