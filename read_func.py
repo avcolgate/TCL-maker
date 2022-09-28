@@ -61,6 +61,7 @@ def append_defines(lines, module):
 
 # * fatals: 
 # duplicate name
+# duplicate name in one string
 # unknown mathematical operation in parameter size
 # unknown subparameter in parameter size
 # negative values in parameter size
@@ -69,247 +70,318 @@ def append_defines(lines, module):
 # too large parameter size
 # too large argument in '<<' operation
 def read_section_params(line, param_list, line_num):
-    param = Param()
+    param_name = ''
+    param_expr = ''
+    param_value = 0
+    temp_param_arr = []
+    param_arr = []
+    param_names_arr = []
 
-    temp = line.content.replace('\t', ' ')
-    temp = temp.replace('parameter', '')
-    temp = re.sub("[;| |\t|,]", "", temp)
-    
-    if '=' in temp:
-        temp_name, temp_expr = temp.split('=')
+    param = line.content.replace('parameter', '')
+    param = re.sub("[;| |\t]", "", param)
+    print(param) # size=32,size2=32
+
+    # several parameters in string
+    if ',' in param:
+        temp_param_arr = param.split(',')
+        print(temp_param_arr) # ['size=32', 'size2=32']
+
+        # check for duplicate names in one string
+        for par in temp_param_arr:
+            if '=' in par:
+                param_name, param_expr = par.split('=')
+                if not param_name in param_names_arr:
+                    param_names_arr.append(param_name)
+                else:
+                    print("fatal: duplicate parameter '%s', line %i\n" % (param_name, line_num + 1))
+                    exit()
+            else:
+                print("fatal: bad parameter, line %i\n" % (line_num + 1))
+                exit()
+    # one parameter in string                    
     else:
-        print("fatal: bad define, line %i\n" % (line_num + 1))
-        exit()
+        temp_param_arr.append(param)
 
-    for par in param_list:
-        if par.name == temp_name:
-            print("fatal: duplicate parameter '%s', line %i\n" % (temp_name, line_num + 1))
-            exit()
 
-    if not is_good_name(temp_name):
-        print("fatal: bad parameter name '%s', line %i\n" % (temp_name, line_num + 1))
-        exit()
-
-    # * parametric size of parameter
-    if not is_number(temp_expr):
-
-        if '<<' in temp_expr:
-            val_left, val_right = temp_expr.split('<<')
-            check = 0
-
-            if not is_number(val_left):
-                for par in param_list:
-                    if val_left == par.name:
-                        val_left = par.value
-                        check += 1
-                        break
-            else:
-                check += 1
-
-            if not is_number(val_right):
-                for par in param_list:
-                    if val_right == par.name:
-                        val_right = par.value
-                        check += 1
-                        break
-            else:
-                check += 1
-
-            # check if every parameter is a number now
-            if check < 2:
-                print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (temp_name, line_num + 1))
-                exit()
-
-            if str(val_left).isdigit() and str(val_right).isdigit():
-                if int(val_right) > 20:
-                    print("fatal: the argument is too large. Parameter '%s', line %i\n" % (temp_name, line_num + 1))
-                    exit()
-                else:
-                    temp_size = int(val_left) << int(val_right)
-            else:
-                print("fatal: arguments in '<<' operation must be positive integer. Parameter '%s', line %i\n" % (temp_name, line_num + 1))
-                exit()
-
-        elif '>>' in temp_expr:
-            val_left, val_right = temp_expr.split('>>')
-            check = 0
-
-            if not is_number(val_left):
-                for par in param_list:
-                    if val_left == par.name:
-                        val_left = par.value
-                        check += 1
-                        break
-            else:
-                check += 1
-
-            if not is_number(val_right):
-                for par in param_list:
-                    if val_right == par.name:
-                        val_right = par.value
-                        check += 1
-                        break
-            else:
-                check += 1
-
-            if check < 2:
-                print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (temp_name, line_num + 1))
-                exit()
-
-            if str(val_left).isdigit() and str(val_right).isdigit():
-                temp_size = int(val_left) >> int(val_right)
-            else:
-                print("fatal: arguments in '>>' operation must be positive integer. Parameter '%s', line %i\n" % (temp_name, line_num + 1))
-                exit()
-            
-        elif '+' in temp_expr:
-            val_left, val_right = temp_expr.split('+')
-            check = 0
-
-            if not is_number(val_left):
-                for par in param_list:
-                    if val_left == par.name:
-                        val_left = par.value
-                        check += 1
-                        break
-            else:
-                check += 1
-
-            if not is_number(val_right):
-                for par in param_list:
-                    if val_right == par.name:
-                        val_right = par.value
-                        check += 1
-                        break
-            else:
-                check += 1
-
-            if check < 2:
-                print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (temp_name, line_num + 1))
-                exit()
-
-            if str(val_left).isdigit() and str(val_right).isdigit():
-                temp_size = int(val_left) + int(val_right)
-            else:
-                print("fatal: arguments in '+' must be positive integer. Parameter '%s', line %i\n" % (temp_name, line_num + 1))
-                exit()    
-
-        elif '-' in temp_expr:
-            val_left, val_right = temp_expr.split('-')
-            check = 0
-
-            if not is_number(val_left):
-                for par in param_list:
-                    if val_left == par.name:
-                        val_left = par.value
-                        check += 1
-                        break
-            else:
-                check += 1
-
-            if not is_number(val_right):
-                for par in param_list:
-                    if val_right == par.name:
-                        val_right = par.value
-                        check += 1
-                        break
-            else:
-                check += 1
-
-            if check < 2:
-                print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (temp_name, line_num + 1))
-                exit()
-
-            if str(val_left).isdigit() and str(val_right).isdigit():
-                temp_size = int(val_left) - int(val_right)
-            else:
-                print("fatal: arguments in '-' must be positive integer. Parameter '%s', line %i\n" % (temp_name, line_num + 1))
-                exit()
-
-        elif '*' in temp_expr:
-            val_left, val_right = temp_expr.split('*')
-            check = 0
-
-            if not is_number(val_left):
-                for par in param_list:
-                    if val_left == par.name:
-                        val_left = par.value
-                        check += 1
-                        break
-            else:
-                check += 1
-
-            if not is_number(val_right):
-                for par in param_list:
-                    if val_right == par.name:
-                        val_right = par.value
-                        check += 1
-                        break
-            else:
-                check += 1
-
-            if check < 2:
-                print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (temp_name, line_num + 1))
-                exit()
-
-            if str(val_left).isdigit() and str(val_right).isdigit():
-                temp_size = int(val_left) * int(val_right)
-            else:
-                print("fatal: arguments in '*' must be positive integer. Parameter '%s', line %i\n" % (temp_name, line_num + 1))
-                exit()
-
-        elif '/' in temp_expr:
-            val_left, val_right = temp_expr.split('/')
-            check = 0
-
-            if not is_number(val_left):
-                for par in param_list:
-                    if val_left == par.name:
-                        val_left = par.value
-                        check += 1
-                        break
-            else:
-                check += 1
-                
-            if not is_number(val_right):
-                for par in param_list:
-                    if val_right == par.name:
-                        val_right = par.value
-                        check += 1
-                        break
-            else:
-                check += 1
-
-            if check < 2:
-                print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (temp_name, line_num + 1))
-                exit()
-
-            if str(val_left).isdigit() and str(val_right).isdigit():
-                if int(val_left) % int(val_right) == 0:
-                    temp_size = int(int(val_left) / int(val_right))
-                else:
-                    print("fatal: parameter '%s' must be positive integer, line %i\n" % (temp_name, line_num + 1))
-                    exit()
-            else:
-                print("fatal: unknown expression in size of parameter '%s', line %i\n" % (temp_name, line_num + 1))
-                exit()
-
+    for param in temp_param_arr:
+        parameter = Parameter()
+    
+        if '=' in param:
+            param_name, param_expr = param.split('=')
         else:
-            print("fatal: unknown expression in parameter value %s, line %i\n" % (temp_name, line_num + 1))
+            print("fatal: bad parameter '%s', line %i\n" % (param_name, line_num + 1))
             exit()
-    
-    # * simple parameter size
-    else:
-        temp_size = temp_expr
 
-    if str(temp_size).isdigit() and int(temp_size) > 0 and int(temp_size) < 100000:
-        param.name =  temp_name
-        param.value = int(temp_size)
-    else:
-        print("fatal: parameter '%s' must be positive integer, line %i\n" % (temp_name, line_num + 1))
-        exit()
+        for par in param_list:
+            if par.name == param_name:
+                print("fatal: duplicate parameter '%s', line %i\n" % (param_name, line_num + 1))
+                exit()
+                
+
+        if not is_good_name(param_name):
+            print("fatal: bad parameter name '%s', line %i\n" % (param_name, line_num + 1))
+            exit()
+
+        # * parametric size of parameter
+        if not is_number(param_expr):
+
+            # <digit>'<base> <number>
+            if '\'' in param_expr:
+                size_digit, size_val = param_expr.split('\'')
+                size_val = str(size_val).lower()
+                if size_val[0] == 'd':
+                    param_value = size_val[size_val.find('d')+1:]
+                    try:
+                        param_value = int(param_value, base=10)
+                    except:
+                        print("fatal: the size of parameter '%s' does not belong to it's notation system, line %i\n" % (param_name, line_num + 1))
+                        exit()
+                elif size_val[0] == 'b':
+                    param_value = size_val[size_val.find('b')+1:]
+                    try:
+                        param_value = int(param_value, base=2)
+                    except:
+                        print("fatal: the size of parameter '%s' does not belong to it's notation system, line %i\n" % (param_name, line_num + 1))
+                        exit()
+                    print(param_value)
+                elif size_val[0] == 'h':
+                    param_value = size_val[size_val.find('h')+1:]
+                    try:
+                        param_value = int(param_value, base=16)
+                    except:
+                        print("fatal: the size of parameter '%s' does not belong to it's notation system, line %i\n" % (param_name, line_num + 1))
+                        exit()
+                    print(param_value)
+                elif size_val[0] == 'o':
+                    param_value = size_val[size_val.find('o')+1:]
+                    try:
+                        param_value = int(param_value, base=8)
+                    except:
+                        print("fatal: the size of parameter '%s' does not belong to it's notation system, line %i\n" % (param_name, line_num + 1))
+                        exit()
+                    print(param_value)
+                else:
+                    print("fatal: unknown expression in parameter value %s, line %i\n" % (param_name, line_num + 1))
+                    exit()
+
+            elif '<<' in param_expr:
+                val_left, val_right = param_expr.split('<<')
+                check = 0
+
+                if not is_number(val_left):
+                    for par in param_list:
+                        if val_left == par.name:
+                            val_left = par.value
+                            check += 1
+                            break
+                else:
+                    check += 1
+
+                if not is_number(val_right):
+                    for par in param_list:
+                        if val_right == par.name:
+                            val_right = par.value
+                            check += 1
+                            break
+                else:
+                    check += 1
+
+                # check if every parameter is a number now
+                if check < 2:
+                    print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
+                    exit()
+
+                if str(val_left).isdigit() and str(val_right).isdigit():
+                    if int(val_right) > 20:
+                        print("fatal: the argument is too large. Parameter '%s', line %i\n" % (param_name, line_num + 1))
+                        exit()
+                    else:
+                        param_value = int(val_left) << int(val_right)
+                else:
+                    print("fatal: arguments in '<<' operation must be positive integer. Parameter '%s', line %i\n" % (param_name, line_num + 1))
+                    exit()
+
+            elif '>>' in param_expr:
+                val_left, val_right = param_expr.split('>>')
+                check = 0
+
+                if not is_number(val_left):
+                    for par in param_list:
+                        if val_left == par.name:
+                            val_left = par.value
+                            check += 1
+                            break
+                else:
+                    check += 1
+
+                if not is_number(val_right):
+                    for par in param_list:
+                        if val_right == par.name:
+                            val_right = par.value
+                            check += 1
+                            break
+                else:
+                    check += 1
+
+                if check < 2:
+                    print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
+                    exit()
+
+                if str(val_left).isdigit() and str(val_right).isdigit():
+                    param_value = int(val_left) >> int(val_right)
+                else:
+                    print("fatal: arguments in '>>' operation must be positive integer. Parameter '%s', line %i\n" % (param_name, line_num + 1))
+                    exit()
+                
+            elif '+' in param_expr:
+                val_left, val_right = param_expr.split('+')
+                check = 0
+
+                if not is_number(val_left):
+                    for par in param_list:
+                        if val_left == par.name:
+                            val_left = par.value
+                            check += 1
+                            break
+                else:
+                    check += 1
+
+                if not is_number(val_right):
+                    for par in param_list:
+                        if val_right == par.name:
+                            val_right = par.value
+                            check += 1
+                            break
+                else:
+                    check += 1
+
+                if check < 2:
+                    print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
+                    exit()
+
+                if str(val_left).isdigit() and str(val_right).isdigit():
+                    param_value = int(val_left) + int(val_right)
+                else:
+                    print("fatal: arguments in '+' must be positive integer. Parameter '%s', line %i\n" % (param_name, line_num + 1))
+                    exit()    
+
+            elif '-' in param_expr:
+                val_left, val_right = param_expr.split('-')
+                check = 0
+
+                if not is_number(val_left):
+                    for par in param_list:
+                        if val_left == par.name:
+                            val_left = par.value
+                            check += 1
+                            break
+                else:
+                    check += 1
+
+                if not is_number(val_right):
+                    for par in param_list:
+                        if val_right == par.name:
+                            val_right = par.value
+                            check += 1
+                            break
+                else:
+                    check += 1
+
+                if check < 2:
+                    print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
+                    exit()
+
+                if str(val_left).isdigit() and str(val_right).isdigit():
+                    param_value = int(val_left) - int(val_right)
+                else:
+                    print("fatal: arguments in '-' must be positive integer. Parameter '%s', line %i\n" % (param_name, line_num + 1))
+                    exit()
+
+            elif '*' in param_expr:
+                val_left, val_right = param_expr.split('*')
+                check = 0
+
+                if not is_number(val_left):
+                    for par in param_list:
+                        if val_left == par.name:
+                            val_left = par.value
+                            check += 1
+                            break
+                else:
+                    check += 1
+
+                if not is_number(val_right):
+                    for par in param_list:
+                        if val_right == par.name:
+                            val_right = par.value
+                            check += 1
+                            break
+                else:
+                    check += 1
+
+                if check < 2:
+                    print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
+                    exit()
+
+                if str(val_left).isdigit() and str(val_right).isdigit():
+                    param_value = int(val_left) * int(val_right)
+                else:
+                    print("fatal: arguments in '*' must be positive integer. Parameter '%s', line %i\n" % (param_name, line_num + 1))
+                    exit()
+
+            elif '/' in param_expr:
+                val_left, val_right = param_expr.split('/')
+                check = 0
+
+                if not is_number(val_left):
+                    for par in param_list:
+                        if val_left == par.name:
+                            val_left = par.value
+                            check += 1
+                            break
+                else:
+                    check += 1
+                    
+                if not is_number(val_right):
+                    for par in param_list:
+                        if val_right == par.name:
+                            val_right = par.value
+                            check += 1
+                            break
+                else:
+                    check += 1
+
+                if check < 2:
+                    print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
+                    exit()
+
+                if str(val_left).isdigit() and str(val_right).isdigit():
+                    if int(val_left) % int(val_right) == 0:
+                        param_value = int(int(val_left) / int(val_right))
+                    else:
+                        print("fatal: parameter '%s' must be positive integer, line %i\n" % (param_name, line_num + 1))
+                        exit()
+                else:
+                    print("fatal: unknown expression in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
+                    exit()
+
+            else:
+                print("fatal: unknown expression in parameter value %s, line %i\n" % (param_name, line_num + 1))
+                exit()
+        
+        # * simple parameter size
+        else:
+            param_value = param_expr
+
+        if str(param_value).isdigit() and int(param_value) >= 0 and int(param_value) < 100000:
+            parameter.name =  param_name
+            parameter.value = int(param_value)
+        else:
+            print("fatal: parameter '%s' must be not negative integer, line %i\n" % (param_name, line_num + 1))
+            exit()
+        param_arr.append(parameter)
     
-    return param
+    return param_arr
 
 
 # * fatals:
