@@ -420,7 +420,7 @@ def read_section_pins(line, param_list, define_list, pin_list, line_num):
                 exit()   
 
         if not is_good_name(pin.name):
-            print("fatal: bad parameter name '%s', line %i\n" % (pin.name, line_num + 1))
+            print("fatal: bad pin name '%s', line %i\n" % (pin.name, line_num + 1))
             exit()
 
     # * parametric size
