@@ -418,10 +418,10 @@ def read_section_pins(line, param_list, define_list, pin_list, line_num):
             if pin.name == name:
                 print("fatal: duplicate pin name '%s', line %i\n" % (name, line_num + 1))
                 exit()   
-    #!!!
-    # if pin.name in keyword_list:
-    #     print("fatal: pin name '%s' must not be a keyword, line %i\n" % (temp_name, line_num + 1))
-    #     exit()
+
+        if not is_good_name(pin.name):
+            print("fatal: bad parameter name '%s', line %i\n" % (pin.name, line_num + 1))
+            exit()
 
     # * parametric size
     if pin_size:
