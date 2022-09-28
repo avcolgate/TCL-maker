@@ -70,12 +70,11 @@ def main():
             else:
                 if line.is_param_section():
                     # print(line.content)
-                    param = read_section_params(line, module.params, line_num + module_offset)
-                    module.append_param(param)
+                    param_arr = read_section_params(line, module.params, line_num + module_offset)
+                    for param in param_arr:
+                        module.append_param(param)
                     continue
                 
-                #TODO поддержка значений с разрядностью
-                #TODO поддержка ввода нескольких параматров в строке
                 if line.is_pin_section():
                     # print(line.content)
                     pin_arr = read_section_pins(line, module.params, module.defines, module.pins, line_num + module_offset)
