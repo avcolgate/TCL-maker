@@ -7,11 +7,8 @@ class Module:
         self.pins = []
 
     def print(self):
-        if self.name == '':
-            print('Not found')
-            return
-        else:
-            print('Module: %s\n' % self.name)
+        
+        print('Module: %s\n' % self.name)
 
         print("Defines [%i]:" % len(self.defines))
         for define in self.defines:

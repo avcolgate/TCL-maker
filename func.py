@@ -1,3 +1,4 @@
+import re
 from keywords import keyword_list
 
 # True for int, float any sign
@@ -9,11 +10,25 @@ def is_number(str):
         return False
 
 def is_good_name(name):
+    # cannot be a keyword
     if name in keyword_list:
         return 0
 
-    if not (str(name[0]).isalpha() or str(name[0]) == '_'):
+    # can include only letters, digits, _, $
+    for letter in name:
+        if letter.isalpha() or letter.isdigit() or letter == '_' or letter == '$':
+            continue
+        else:
+            return 0
+
+    # starts with alpha
+    if not str(name[0]).isalpha():
         return 0
+
+    # cannot start with dollar
+    if str(name[0]) == '$':
+        return 0
+
     return 1
 
 def skip_comment(line):

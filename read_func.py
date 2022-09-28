@@ -507,7 +507,6 @@ def read_section_pins(line, param_list, define_list, pin_list, line_num):
 # two or more modules modules have the maximum number of attachments
 def get_top_module(lines, specified_name = ''):
     module_list = []
-    module_offset = 0
     top_module = Module()
     found_specified = False
          

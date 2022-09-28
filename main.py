@@ -86,7 +86,8 @@ def main():
                     is_module_section = False
                     break
 
-    module.print()
+        if module.name != '':
+            module.print()
 
 
 if __name__ == "__main__":
