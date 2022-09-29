@@ -70,3 +70,23 @@ def define_expression(val_left, val_right, param_list, define_list):
         check += 1
 
     return val_left, val_right, check
+
+
+def define_param_define(val, param_list, define_list):
+    check = 0
+
+    if not is_number(val):
+        for par in param_list:
+            if val == par.name:
+                val = par.value
+                check += 1
+                break
+        for define in define_list:
+            if '`' + define.name == val:
+                val = define.value
+                check += 1
+                break
+    else:
+        check += 1
+
+    return val, check

@@ -262,6 +262,15 @@ def read_section_params(line, param_list, define_list, line_num):
                     print("fatal: unknown expression in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
                     exit()
 
+            elif str(param_expr).isalpha():
+                val, check = define_param_define(param_expr, param_list, define_list)
+
+                if check < 1:
+                    print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
+                    exit()
+                else:
+                    param_value = int(val)
+
             else:
                 print("fatal: unknown expression in parameter value %s, line %i\n" % (param_name, line_num + 1))
                 exit()
