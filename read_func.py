@@ -270,6 +270,7 @@ def read_section_params(line, param_list, define_list, line_num):
 # equal limits in pin size
 def read_section_pins(line, param_list, define_list, pin_list, line_num):
     pin_arr = []
+    pin_size = ''
     pin_direction = 'NaN'
     k = 1
 
@@ -281,8 +282,15 @@ def read_section_pins(line, param_list, define_list, pin_list, line_num):
 
     pin_size = temp[temp.find('['):temp.find(']') + 1] # [...]
     
-    temp_name = temp_direction_name.replace(pin_direction, '')
-    temp_name = temp_name.replace('reg', '').replace('wire', '') #? also delete SystemVerilog's 'logic'?
+    temp_name = temp_direction_name.replace(pin_direction, '').strip()
+
+    temp_name = temp_name.replace('reg', '').replace('wire', '').replace('tri', '').replace('integer', '')
+    temp_name = temp_name.strip()
+    # check if there is a bad type in temp_name (whitespace between)
+    if ' ' in temp_name:
+        print("fatal: bad pin type '%s', line %i\n" % (temp_name, line_num + 1))
+        exit()  
+
     temp_name = re.sub("[;| |\t]", "", temp_name) # name1,name2,..
     temp_name_arr = temp_name.split(',')
     temp_name_arr = list(filter(None, temp_name_arr))  # deleting '' names
