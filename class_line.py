@@ -11,21 +11,21 @@ class Line:
         self.content = skip_comment(self.content)
         return True
 
-    def is_name_section(self, module_name, module_body, line_num):
-        name = ''
-        for i in range(line_num, len(module_body)):
-            line = module_body[i].strip()
-            name += line + ' '
-            if ';' in line:
-                name = re.sub(r'\([^()]*\)', '', name)
-                name = name.replace('module', '')
-                name = re.sub('[;| ]', '', name)
-                # print(name)
-                break
+    # def is_name_section(self, module_name, module_body_arr, line_num):
+    #     name = ''
+    #     for i in range(line_num, len(module_body_arr)):
+    #         line = module_body_arr[i].strip()
+    #         name += line + ' '
+    #         if ';' in line:
+    #             name = re.sub(r'\([^()]*\)', '', name)
+    #             name = name.replace('module', '')
+    #             name = re.sub('[;| ]', '', name)
+    #             # print(name)
+    #             break
         
-        if name == module_name:
-            return True
-        return False
+    #     if name == module_name:
+    #         return True
+    #     return False
 
     def is_define_section(self):
         if '`define' in self.content:

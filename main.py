@@ -3,7 +3,7 @@ import sys
 
 from read_func import *
 
-MANUAL = True
+MANUAL = False
 
 def main():
     print('MANUAL MODE\n') if MANUAL else print('AUTOMATIC MODE\n')
@@ -51,23 +51,20 @@ def main():
             top_module = get_top_module(lines)
 
         module_name = top_module.name
-        module_body = top_module.text_arr
+        module_body_arr = top_module.text_arr
         module_offset = top_module.offset + 1
 
 
-        for line_num, curr_line in enumerate(module_body): # TODO сделать отдельную функцию
+        for line_num, curr_line in enumerate(module_body_arr): # TODO сделать отдельную функцию
             line = Line(curr_line)
-
-            line.erase_comment()
             
-            if not is_module_section:
-                if line.is_name_section(module_name, module_body, line_num):
-                    # print(line.content)
-                    module.append_name(module_name)
-                    is_module_section = True
-                    continue
+            if not is_module_section and line.is_module_section():
+                # print(line.content)
+                module.append_name(module_name)
+                is_module_section = True
+                continue
 
-            else:
+            if is_module_section:
                 if line.is_param_section():
                     # print(line.content)
                     param_arr = read_section_params(line, module.params, line_num + module_offset)

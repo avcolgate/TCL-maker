@@ -11,7 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["src/spm.v"]
+            "args": ["src/lib_sample.v"]
         }
     ]
 }

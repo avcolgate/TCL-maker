@@ -618,7 +618,7 @@ def get_top_module(lines, specified_name = ''):
         if not module_fs.name:
             temp_name += temp_line + ' '
 
-            # ';' is end of module string
+            # note: ';' is end of module string
             if ';' in temp_line:
                 temp_name = re.sub(r'\([^()]*\)', '', temp_name)
                 temp_name = temp_name.replace('module', '')

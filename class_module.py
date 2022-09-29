@@ -8,7 +8,7 @@ class Module:
 
     def print(self):
         
-        print('Module: %s\n' % self.name)
+        print('Name: %s\n' % self.name)
 
         print("Defines [%i]:" % len(self.defines))
         for define in self.defines:
@@ -68,7 +68,7 @@ class Module_for_search():
 
 
 class Pin:
-    def __init__(self, name='', direction='', size=1):
+    def __init__(self, name='', direction='', size=-1):
         self.name = name
         self.direction = direction
         self.size = size
@@ -80,11 +80,11 @@ class Pin:
 
 
 class Parameter:
-    def __init__(self, name='', value=0):
+    def __init__(self, name='', value=-1):
         self.name = name
         self.value = value
 
 class Define:
-    def __init__(self, name='', value=0):
+    def __init__(self, name='', value=-1):
         self.name = name
         self.value = value
