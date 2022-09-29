@@ -69,22 +69,22 @@ def append_defines(lines, module):
 # difficult expression in parameter size
 # too large parameter size
 # too large argument in '<<' operation
-def read_section_params(line, param_list, line_num):
+def read_section_params(line, param_list, define_list, line_num):
     param_name = ''
     param_expr = ''
     param_value = 0
-    temp_param_arr = []
     param_arr = []
+    temp_param_arr = []
     param_names_arr = []
 
     param = line.content.replace('parameter', '')
     param = re.sub("[;| |\t]", "", param)
-    print(param) # size=32,size2=32
+    # print(param) # size=32,size2=32
 
     # several parameters in string
     if ',' in param:
         temp_param_arr = param.split(',')
-        print(temp_param_arr) # ['size=32', 'size2=32']
+        # print(temp_param_arr) # ['size=32', 'size2=32']
 
         # check for duplicate names in one string
         for par in temp_param_arr:
@@ -117,7 +117,6 @@ def read_section_params(line, param_list, line_num):
                 print("fatal: duplicate parameter '%s', line %i\n" % (param_name, line_num + 1))
                 exit()
                 
-
         if not is_good_name(param_name):
             print("fatal: bad parameter name '%s', line %i\n" % (param_name, line_num + 1))
             exit()
@@ -166,25 +165,8 @@ def read_section_params(line, param_list, line_num):
 
             elif '<<' in param_expr:
                 val_left, val_right = param_expr.split('<<')
-                check = 0
 
-                if not is_number(val_left):
-                    for par in param_list:
-                        if val_left == par.name:
-                            val_left = par.value
-                            check += 1
-                            break
-                else:
-                    check += 1
-
-                if not is_number(val_right):
-                    for par in param_list:
-                        if val_right == par.name:
-                            val_right = par.value
-                            check += 1
-                            break
-                else:
-                    check += 1
+                val_left, val_right, check = define_expression(val_left, val_right, param_list, define_list)
 
                 # check if every parameter is a number now
                 if check < 2:
@@ -203,25 +185,8 @@ def read_section_params(line, param_list, line_num):
 
             elif '>>' in param_expr:
                 val_left, val_right = param_expr.split('>>')
-                check = 0
-
-                if not is_number(val_left):
-                    for par in param_list:
-                        if val_left == par.name:
-                            val_left = par.value
-                            check += 1
-                            break
-                else:
-                    check += 1
-
-                if not is_number(val_right):
-                    for par in param_list:
-                        if val_right == par.name:
-                            val_right = par.value
-                            check += 1
-                            break
-                else:
-                    check += 1
+                
+                val_left, val_right, check = define_expression(val_left, val_right, param_list, define_list)
 
                 if check < 2:
                     print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
@@ -235,25 +200,8 @@ def read_section_params(line, param_list, line_num):
                 
             elif '+' in param_expr:
                 val_left, val_right = param_expr.split('+')
-                check = 0
-
-                if not is_number(val_left):
-                    for par in param_list:
-                        if val_left == par.name:
-                            val_left = par.value
-                            check += 1
-                            break
-                else:
-                    check += 1
-
-                if not is_number(val_right):
-                    for par in param_list:
-                        if val_right == par.name:
-                            val_right = par.value
-                            check += 1
-                            break
-                else:
-                    check += 1
+                
+                val_left, val_right, check = define_expression(val_left, val_right, param_list, define_list)
 
                 if check < 2:
                     print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
@@ -267,25 +215,8 @@ def read_section_params(line, param_list, line_num):
 
             elif '-' in param_expr:
                 val_left, val_right = param_expr.split('-')
-                check = 0
-
-                if not is_number(val_left):
-                    for par in param_list:
-                        if val_left == par.name:
-                            val_left = par.value
-                            check += 1
-                            break
-                else:
-                    check += 1
-
-                if not is_number(val_right):
-                    for par in param_list:
-                        if val_right == par.name:
-                            val_right = par.value
-                            check += 1
-                            break
-                else:
-                    check += 1
+                
+                val_left, val_right, check = define_expression(val_left, val_right, param_list, define_list)
 
                 if check < 2:
                     print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
@@ -299,25 +230,8 @@ def read_section_params(line, param_list, line_num):
 
             elif '*' in param_expr:
                 val_left, val_right = param_expr.split('*')
-                check = 0
-
-                if not is_number(val_left):
-                    for par in param_list:
-                        if val_left == par.name:
-                            val_left = par.value
-                            check += 1
-                            break
-                else:
-                    check += 1
-
-                if not is_number(val_right):
-                    for par in param_list:
-                        if val_right == par.name:
-                            val_right = par.value
-                            check += 1
-                            break
-                else:
-                    check += 1
+                
+                val_left, val_right, check = define_expression(val_left, val_right, param_list, define_list)
 
                 if check < 2:
                     print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
@@ -331,25 +245,8 @@ def read_section_params(line, param_list, line_num):
 
             elif '/' in param_expr:
                 val_left, val_right = param_expr.split('/')
-                check = 0
-
-                if not is_number(val_left):
-                    for par in param_list:
-                        if val_left == par.name:
-                            val_left = par.value
-                            check += 1
-                            break
-                else:
-                    check += 1
-                    
-                if not is_number(val_right):
-                    for par in param_list:
-                        if val_right == par.name:
-                            val_right = par.value
-                            check += 1
-                            break
-                else:
-                    check += 1
+                
+                val_left, val_right, check = define_expression(val_left, val_right, param_list, define_list)
 
                 if check < 2:
                     print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))

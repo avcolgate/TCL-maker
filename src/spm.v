@@ -1,3 +1,4 @@
+`define DEF 5
 
 module 
 spm 
@@ -5,12 +6,19 @@ spm
     parameter size = 32;
 	parameter size_mini = 4;
 	//parameter size_fatal = size ^ 1;
-	parameter size_left = size << 10;
+    parameter size_left = size << 10;
 	parameter size_right = size >> size_mini;
 	parameter size_plus = size + size;
 	parameter size_minus = size - size_mini;
 	parameter size_mul = size * 100;
 	parameter size_div = size / size_mini;
+    
+	parameter new_size_left = `DEF << `DEF;
+	parameter new_size_right = `DEF >> `DEF;
+	parameter new_size_plus = `DEF + `DEF;
+	parameter new_size_minus = `DEF - `DEF;
+	parameter new_size_mul = `DEF * `DEF;
+	parameter new_size_div = `DEF / `DEF;
 	
 	
     input clk, rst;

@@ -67,7 +67,7 @@ def main():
             if is_module_section:
                 if line.is_param_section():
                     # print(line.content)
-                    param_arr = read_section_params(line, module.params, line_num + module_offset)
+                    param_arr = read_section_params(line, module.params, module.defines, line_num + module_offset)
                     for param in param_arr:
                         module.append_param(param)
                     continue

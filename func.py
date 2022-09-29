@@ -36,3 +36,37 @@ def skip_comment(line):
         line = line[:line.find('//')]
 
     return line
+
+
+def define_expression(val_left, val_right, param_list, define_list):
+    check = 0
+
+    if not is_number(val_left):
+        for par in param_list:
+            if val_left == par.name:
+                val_left = par.value
+                check += 1
+                break
+        for define in define_list:
+            if '`' + define.name == val_left:
+                val_left = define.value
+                check += 1
+                break
+    else:
+        check += 1
+
+    if not is_number(val_right):
+        for par in param_list:
+            if val_right == par.name:
+                val_right = par.value
+                check += 1
+                break
+        for define in define_list:
+            if '`' + define.name == val_right:
+                val_right = define.value
+                check += 1
+                break
+    else:
+        check += 1
+
+    return val_left, val_right, check
