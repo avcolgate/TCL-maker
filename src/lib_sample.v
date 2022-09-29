@@ -18,7 +18,7 @@ module lib_sample (
 	parameter size = 32;
 	parameter size0 = size, size1 = 32, size3 = 33, size4 = 2; //new
 	
-	parameter s0 = 3'd0, s1 = 3'd1, s2 = 3'd2, s3 = 3'd3, s4 = 3'd4, s5 = 3'd5;
+	parameter s0 = 3'd0, s1 = 3'b1111, s2 = 3'hFFA1, s3 = 3'o7, s4 = 3'd4, s5 = 3'd5;
 
 input	CLK;
 input	RST_B;

@@ -90,3 +90,15 @@ def define_param_define(val, param_list, define_list):
         check += 1
 
     return val, check
+
+def convert_number(size_val, my_base, param_name, line_num):
+    my_dict = {'d': 10, 'b': 2, 'h': 16, 'o': 8}
+    param_value = size_val[size_val.find(my_base)+1:]
+
+    try:
+        param_value = int(param_value, base=my_dict[my_base])
+    except:
+        print("fatal: the size of parameter '%s' does not belong to it's notation system, line %i\n" % (param_name, line_num + 1))
+        exit()
+    
+    return param_value

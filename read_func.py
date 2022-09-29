@@ -128,40 +128,9 @@ def read_section_params(line, param_list, define_list, line_num):
             if '\'' in param_expr:
                 size_digit, size_val = param_expr.split('\'')
                 size_val = str(size_val).lower()
-                if size_val[0] == 'd':
-                    param_value = size_val[size_val.find('d')+1:]
-                    try:
-                        param_value = int(param_value, base=10)
-                    except:
-                        print("fatal: the size of parameter '%s' does not belong to it's notation system, line %i\n" % (param_name, line_num + 1))
-                        exit()
-                elif size_val[0] == 'b':
-                    param_value = size_val[size_val.find('b')+1:]
-                    try:
-                        param_value = int(param_value, base=2)
-                    except:
-                        print("fatal: the size of parameter '%s' does not belong to it's notation system, line %i\n" % (param_name, line_num + 1))
-                        exit()
-                    print(param_value)
-                elif size_val[0] == 'h':
-                    param_value = size_val[size_val.find('h')+1:]
-                    try:
-                        param_value = int(param_value, base=16)
-                    except:
-                        print("fatal: the size of parameter '%s' does not belong to it's notation system, line %i\n" % (param_name, line_num + 1))
-                        exit()
-                    print(param_value)
-                elif size_val[0] == 'o':
-                    param_value = size_val[size_val.find('o')+1:]
-                    try:
-                        param_value = int(param_value, base=8)
-                    except:
-                        print("fatal: the size of parameter '%s' does not belong to it's notation system, line %i\n" % (param_name, line_num + 1))
-                        exit()
-                    print(param_value)
-                else:
-                    print("fatal: unknown expression in parameter value %s, line %i\n" % (param_name, line_num + 1))
-                    exit()
+                my_base = size_val[0]
+
+                param_value = convert_number(size_val, my_base, param_name, line_num)
 
             elif '<<' in param_expr:
                 val_left, val_right = param_expr.split('<<')
