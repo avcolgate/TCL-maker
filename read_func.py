@@ -286,158 +286,108 @@ def read_section_pins(line, param_list, define_list, pin_list, line_num):
 
     temp_name = temp_name.replace('reg', '').replace('wire', '').replace('tri', '').replace('integer', '')
     temp_name = temp_name.strip()
+
     # check if there is a bad type in temp_name (whitespace between)
-    if ' ' in temp_name:
+    if ' ' in temp_name and not ',' in temp_name:
         print("fatal: bad pin type '%s', line %i\n" % (temp_name, line_num + 1))
         exit()  
 
     temp_name = re.sub("[;| |\t]", "", temp_name) # name1,name2,..
-    temp_name_arr = temp_name.split(',')
+    if ',' in temp_name:
+        temp_name_arr = temp_name.split(',')
+    else:
+        temp_name_arr = [temp_name]
     temp_name_arr = list(filter(None, temp_name_arr))  # deleting '' names
     # print('temp_name_arr:', temp_name_arr) # names array
 
+    # check for duplicate and bad name
+    for name in temp_name_arr:
+            if not is_good_name(name):
+                print("fatal: bad pin name '%s', line %i\n" % (name, line_num + 1))
+                exit()
     for pin in pin_list:
         for name in temp_name_arr:
             if pin.name == name:
                 print("fatal: duplicate pin name '%s', line %i\n" % (name, line_num + 1))
                 exit()   
 
-        if not is_good_name(pin.name):
-            print("fatal: bad pin name '%s', line %i\n" % (pin.name, line_num + 1))
-            exit()
 
     # * parametric size
     if pin_size:
 
         pin_size = re.sub("[\[|\]| |\t]", "", pin_size)  # deleting [] and whitespaces
-        temp_size_arr = pin_size.split(':')
-        start_val, end_val = temp_size_arr
+        if ':' in pin_size:
+            temp_size_arr = pin_size.split(':')
+        else:
+            print("fatal: bad pin size '%s', line %i\n" % (name, line_num + 1))
+            exit() 
+        left_val, right_val = temp_size_arr
         # print('temp_size_arr:', temp_size_arr) # sizes array
 
-        if not is_number(start_val):  # if parameter in LEFT part
+        if not is_number(left_val):  # if parameter in LEFT part
 
-            if '-' in start_val:
-                start_val = start_val.split('-')
-                start_val_left, start_val_right = start_val
+            if '-' in left_val:
+                left_part, right_part = left_val.split('-')
                 k = -1
-            elif '+' in start_val:
-                start_val = start_val.split('+')
-                start_val_left, start_val_right = start_val
+            elif '+' in left_val:
+                left_part, right_part = left_val.split('+')
                 k = 1
             else:
-                start_val_left = start_val
-                start_val_right = 0
+                left_part = left_val
+                right_part = 0
                 k = 1
 
-            check = 0
-
-            if not is_number(start_val_left):  # parameter in left subpart
-                for param in param_list:
-                    if param.name == start_val_left:
-                        start_val_left = param.value
-                        check += 1
-                        break
-                for define in define_list:
-                    if '`' + define.name == start_val_left:
-                        start_val_left = define.value
-                        check += 1
-                        break
-            else:
-                check += 1
-
-            if not is_number(start_val_right):  # parameter in right subpart
-                for param in param_list:
-                    if param.name == start_val_right:
-                        start_val_right = param.value
-                        check += 1
-                        break
-                for define in define_list:
-                    if '`' + define.name == start_val_right:
-                        start_val_right = define.value
-                        check += 1
-                        break
-            else:
-                check += 1
+            left_part, right_part, check = define_expression(left_part, right_part, param_list, define_list)
 
             if check < 2:
                 print("fatal: unknown parameter in pin size, line %i\n" % (line_num + 1))
                 exit()
             
-            if str(start_val_left).isdigit() and str(start_val_right).isdigit():
-                start_val = int(start_val_left) + k * int(start_val_right) 
-                if start_val < 0:
+            if str(left_part).isdigit() and str(right_part).isdigit():
+                left_val = int(left_part) + k * int(right_part) 
+                if left_val < 0:
                     print("fatal: arguments in size must be !positive integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
                     exit()
             else:
                 print("fatal: arguments in size must be positive !integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()
 
-        if not is_number(end_val):  # if parameter in RIGHT part
+        if not is_number(right_val):  # if parameter in RIGHT part
 
-            if '-' in end_val:
-                end_val = end_val.split('-')
-                end_val_left, end_val_right = end_val
+            if '-' in right_val:
+                left_part, right_part = right_val.split('-')
                 k = -1
-            elif '+' in end_val:
-                end_val = end_val.split('+')
-                end_val_left, end_val_right = end_val
+            elif '+' in right_val:
+                left_part, right_part = right_val.split('+')
                 k = 1
             else:
-                end_val_left = end_val
-                end_val_right = 0
+                left_part = right_val
+                right_part = 0
                 k = 1
 
-            check = 0
-
-            if not is_number(end_val_left):  # parameter in left subpart
-                for param in param_list:
-                    if param.name == end_val_left:
-                        end_val_left = param.value
-                        check += 1
-                        break
-                for define in define_list:
-                    if '`' + define.name == end_val_left:
-                        end_val_left = define.value
-                        check += 1
-                        break
-            else:
-                check += 1
-
-            if not is_number(end_val_right):  # parameter in right subpart
-                for param in param_list:
-                    if param.name == end_val_right:
-                        end_val_right = param.value
-                        check += 1
-                        break
-                for define in define_list:
-                    if '`' + define.name == end_val_right:
-                        end_val_right = define.value
-                        check += 1
-                        break
-            else:
-                check += 1
+            left_part, right_part, check = define_expression(left_part, right_part, param_list, define_list)
 
             if check < 2:
                 print("fatal: unknown parameter in pin size, line %i\n" % (line_num + 1))
                 exit()
 
-            if str(start_val_left).isdigit() and str(start_val_right).isdigit():
-                end_val = int(end_val_left) + k * int(end_val_right)
-                if end_val < 0:
+            if str(left_part).isdigit() and str(right_part).isdigit():
+                right_val = int(left_part) + k * int(right_part)
+                if right_val < 0:
                     print("fatal: arguments in size must be !positive integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
                     exit()
             else:
                 print("fatal: arguments in size must be positive !integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
                 exit()
 
-        if int(start_val) < 0 or int(end_val) < 0:
+        if int(left_val) < 0 or int(right_val) < 0:
             print("fatal: limits must be positive integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
             exit()
 
-        if start_val == end_val:
+        if left_val == right_val:
             print("warning: equal limits in the pin size. Pin '%s', line %i\n" % (temp_name, line_num + 1))
 
-        pin_true_size = int(start_val) - int(end_val) + 1
+        pin_true_size = int(left_val) - int(right_val) + 1
 
         if pin_true_size < 1:
             print("fatal: pin size must be positive integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
