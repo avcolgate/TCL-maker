@@ -24,7 +24,7 @@ input	CLK;
 input	RST_B;
 input	SELECT_3;
 input	EN_G;
-input [`WIDTH-1:0]	BYPASS;
+input [`WIDTH+`LENGTH:`LENGTH]	BYPASS;
 output	reg CLK_OUT_DIV;
 output	CLK_OUT_G;
 output [`WIDTH-1:0] 	CNTR_OUT1;

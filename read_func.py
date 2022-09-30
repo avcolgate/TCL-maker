@@ -135,12 +135,7 @@ def read_section_params(line, param_list, define_list, line_num):
             elif '<<' in param_expr:
                 val_left, val_right = param_expr.split('<<')
 
-                val_left, val_right, check = define_expression(val_left, val_right, param_list, define_list)
-
-                # check if every parameter is a number now
-                if check < 2:
-                    print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
-                    exit()
+                val_left, val_right = define_expression(val_left, val_right, param_list, define_list, line_num)
 
                 if str(val_left).isdigit() and str(val_right).isdigit():
                     if int(val_right) > 20:
@@ -155,11 +150,7 @@ def read_section_params(line, param_list, define_list, line_num):
             elif '>>' in param_expr:
                 val_left, val_right = param_expr.split('>>')
                 
-                val_left, val_right, check = define_expression(val_left, val_right, param_list, define_list)
-
-                if check < 2:
-                    print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
-                    exit()
+                val_left, val_right = define_expression(val_left, val_right, param_list, define_list, line_num)
 
                 if str(val_left).isdigit() and str(val_right).isdigit():
                     param_value = int(val_left) >> int(val_right)
@@ -170,11 +161,7 @@ def read_section_params(line, param_list, define_list, line_num):
             elif '+' in param_expr:
                 val_left, val_right = param_expr.split('+')
                 
-                val_left, val_right, check = define_expression(val_left, val_right, param_list, define_list)
-
-                if check < 2:
-                    print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
-                    exit()
+                val_left, val_right = define_expression(val_left, val_right, param_list, define_list, line_num)
 
                 if str(val_left).isdigit() and str(val_right).isdigit():
                     param_value = int(val_left) + int(val_right)
@@ -185,11 +172,7 @@ def read_section_params(line, param_list, define_list, line_num):
             elif '-' in param_expr:
                 val_left, val_right = param_expr.split('-')
                 
-                val_left, val_right, check = define_expression(val_left, val_right, param_list, define_list)
-
-                if check < 2:
-                    print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
-                    exit()
+                val_left, val_right = define_expression(val_left, val_right, param_list, define_list, line_num)
 
                 if str(val_left).isdigit() and str(val_right).isdigit():
                     param_value = int(val_left) - int(val_right)
@@ -200,11 +183,7 @@ def read_section_params(line, param_list, define_list, line_num):
             elif '*' in param_expr:
                 val_left, val_right = param_expr.split('*')
                 
-                val_left, val_right, check = define_expression(val_left, val_right, param_list, define_list)
-
-                if check < 2:
-                    print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
-                    exit()
+                val_left, val_right = define_expression(val_left, val_right, param_list, define_list, line_num)
 
                 if str(val_left).isdigit() and str(val_right).isdigit():
                     param_value = int(val_left) * int(val_right)
@@ -215,11 +194,7 @@ def read_section_params(line, param_list, define_list, line_num):
             elif '/' in param_expr:
                 val_left, val_right = param_expr.split('/')
                 
-                val_left, val_right, check = define_expression(val_left, val_right, param_list, define_list)
-
-                if check < 2:
-                    print("fatal: unknown parameter in size of parameter '%s', line %i\n" % (param_name, line_num + 1))
-                    exit()
+                val_left, val_right = define_expression(val_left, val_right, param_list, define_list, line_num)
 
                 if str(val_left).isdigit() and str(val_right).isdigit():
                     if int(val_left) % int(val_right) == 0:
@@ -276,13 +251,13 @@ def read_section_pins(line, param_list, define_list, pin_list, line_num):
 
     temp = line.content.strip().replace('\t', ' ')
 
-    temp_direction_name = re.sub(r'\[[^()]*\]', '', temp) # substracting size
+    pin_direction_name = re.sub(r'\[[^()]*\]', '', temp) # substracting size
 
-    pin_direction = temp_direction_name[:temp_direction_name.find(' ')] # input | output | inout
+    pin_direction = pin_direction_name[:pin_direction_name.find(' ')] # input | output | inout
 
     pin_size = temp[temp.find('['):temp.find(']') + 1] # [...]
     
-    temp_name = temp_direction_name.replace(pin_direction, '').strip()
+    temp_name = pin_direction_name.replace(pin_direction, '').strip()
 
     temp_name = temp_name.replace('reg', '').replace('wire', '').replace('tri', '').replace('integer', '')
     temp_name = temp_name.strip()
@@ -317,71 +292,18 @@ def read_section_pins(line, param_list, define_list, pin_list, line_num):
 
         pin_size = re.sub("[\[|\]| |\t]", "", pin_size)  # deleting [] and whitespaces
         if ':' in pin_size:
-            temp_size_arr = pin_size.split(':')
+            left_val, right_val = pin_size.split(':')
         else:
             print("fatal: bad pin size '%s', line %i\n" % (name, line_num + 1))
-            exit() 
-        left_val, right_val = temp_size_arr
+            exit()
         # print('temp_size_arr:', temp_size_arr) # sizes array
+        
+        left_val = calc_pin_size_expression(left_val, param_list, define_list, temp_name, line_num)
 
-        if not is_number(left_val):  # if parameter in LEFT part
-
-            if '-' in left_val:
-                left_part, right_part = left_val.split('-')
-                k = -1
-            elif '+' in left_val:
-                left_part, right_part = left_val.split('+')
-                k = 1
-            else:
-                left_part = left_val
-                right_part = 0
-                k = 1
-
-            left_part, right_part, check = define_expression(left_part, right_part, param_list, define_list)
-
-            if check < 2:
-                print("fatal: unknown parameter in pin size, line %i\n" % (line_num + 1))
-                exit()
-            
-            if str(left_part).isdigit() and str(right_part).isdigit():
-                left_val = int(left_part) + k * int(right_part) 
-                if left_val < 0:
-                    print("fatal: arguments in size must be !positive integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
-                    exit()
-            else:
-                print("fatal: arguments in size must be positive !integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
-                exit()
-
-        if not is_number(right_val):  # if parameter in RIGHT part
-
-            if '-' in right_val:
-                left_part, right_part = right_val.split('-')
-                k = -1
-            elif '+' in right_val:
-                left_part, right_part = right_val.split('+')
-                k = 1
-            else:
-                left_part = right_val
-                right_part = 0
-                k = 1
-
-            left_part, right_part, check = define_expression(left_part, right_part, param_list, define_list)
-
-            if check < 2:
-                print("fatal: unknown parameter in pin size, line %i\n" % (line_num + 1))
-                exit()
-
-            if str(left_part).isdigit() and str(right_part).isdigit():
-                right_val = int(left_part) + k * int(right_part)
-                if right_val < 0:
-                    print("fatal: arguments in size must be !positive integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
-                    exit()
-            else:
-                print("fatal: arguments in size must be positive !integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
-                exit()
+        right_val = calc_pin_size_expression(right_val, param_list, define_list, temp_name, line_num)
 
         if int(left_val) < 0 or int(right_val) < 0:
-            print("fatal: limits must be positive integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
+            print("fatal: limits in pin size must be positive integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
             exit()
 
         if left_val == right_val:

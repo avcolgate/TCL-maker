@@ -38,7 +38,7 @@ def skip_comment(line):
     return line
 
 
-def define_expression(val_left, val_right, param_list, define_list):
+def define_expression(val_left, val_right, param_list, define_list, line_num):
     check = 0
 
     if not is_number(val_left):
@@ -69,7 +69,11 @@ def define_expression(val_left, val_right, param_list, define_list):
     else:
         check += 1
 
-    return val_left, val_right, check
+    if check < 2:
+        print("fatal: unknown parameter in pin size, line %i\n" % (line_num + 1))
+        exit()
+
+    return val_left, val_right
 
 
 def define_param_define(val, param_list, define_list):
@@ -102,3 +106,47 @@ def convert_number(size_val, my_base, param_name, line_num):
         exit()
     
     return param_value
+
+def calc_pin_size_expression(value, param_list, define_list, temp_name, line_num):
+
+    #TODO добавить << >>
+    char_minus, char_plus, char_mul, char_div = ['-', '+', '*', '/']
+
+    if not is_number(value):
+
+        if char_minus in value:
+            left_part, right_part = value.split(char_minus)
+            left_part, right_part = define_expression(left_part, right_part, param_list, define_list, line_num)
+            value = int(left_part) - int(right_part)
+
+        elif char_plus in value:
+            left_part, right_part = value.split(char_plus)
+            left_part, right_part = define_expression(left_part, right_part, param_list, define_list, line_num)
+            value = int(left_part) + int(right_part)
+
+        elif char_mul in value:
+            left_part, right_part = value.split(char_mul)
+            left_part, right_part = define_expression(left_part, right_part, param_list, define_list, line_num)
+            value = int(left_part) * int(right_part)
+
+        elif char_div in value:
+            left_part, right_part = value.split(char_div)
+            left_part, right_part = define_expression(left_part, right_part, param_list, define_list, line_num)
+            if int(right_part) != 0:
+                value = int(left_part) / int(right_part)
+            else:
+                print("fatal: dividing by 0 in size of pin '%s', line %i\n" % (temp_name, line_num + 1))
+                exit()
+                
+        else:
+            value, check = define_param_define(value, param_list, define_list)
+            print(value)
+            if not str(value).isdigit():
+                print("fatal: unknown operation in size of pin '%s', line %i\n" % (temp_name, line_num + 1))
+                exit()
+        
+        if value < 0:
+            print("fatal: arguments in size must be positive integer. Pin '%s', line %i\n" % (temp_name, line_num + 1))
+            exit()
+
+    return value
