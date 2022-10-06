@@ -1,4 +1,3 @@
-import re
 
 from func import skip_comment
 
@@ -26,16 +25,6 @@ class Line:
     #     if name == module_name:
     #         return True
     #     return False
-
-    def is_define_section(self):
-        if '`define' in self.content:
-            return True
-        return False
-
-    def is_param_section(self):
-        if 'parameter' in self.content:
-            return True
-        return False
 
     def is_pin_section(self):
         if 'input' in self.content or 'output' in self.content or 'inout' in self.content:

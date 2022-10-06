@@ -27,8 +27,6 @@ def main():
         
         lines = file.read().split('\n')
 
-        append_defines(lines, module)
-
         if MANUAL:
             # module name is specified
             if len(sys.argv) > 2:
@@ -65,16 +63,10 @@ def main():
                 continue
 
             if is_module_section:
-                if line.is_param_section():
-                    # print(line.content)
-                    param_arr = read_section_params(line, module.params, module.defines, line_num + module_offset)
-                    for param in param_arr:
-                        module.append_param(param)
-                    continue
                 
                 if line.is_pin_section():
                     # print(line.content)
-                    pin_arr = read_section_pins(line, module.params, module.defines, module.pins, line_num + module_offset)
+                    pin_arr = read_section_pins(line, module.pins, line_num + module_offset)
                     for pin in pin_arr:
                         module.append_pin(pin)
                     continue
