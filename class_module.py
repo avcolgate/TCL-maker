@@ -4,16 +4,18 @@ class Module:
         self.name = name
         self.pins = []
 
-    def print(self):
-        
-        print('Name: %s\n' % self.name)
+    def print(self, file):
+        if self.name == '':
+            print('fatal: empty module\n')
+            exit()
 
-        print("Pins [%i]:" % len(self.pins))
+        file.write('Name: %s\n' % self.name)
+
+        file.write("Pins [%i]:\n" % len(self.pins))
         for pin in self.pins:
             for dir in ['input', 'output', 'inout']:
                 if dir == pin.direction:
-                    print('%7s %12s %6s' % (pin.direction, pin.name, pin.is_bus))
-        print('\n')
+                    file.write('%7s %12s %6s\n' % (pin.direction, pin.name, pin.is_bus))
 
     def append_name(self, name):
         self.name = name
@@ -24,7 +26,7 @@ class Module:
             pin.direction == 'inout':
             self.pins.append(pin)
         else:
-            print('fatal: wrong type of pin %s' % pin.name)
+            print('fatal: wrong type of pin %s\n' % pin.name)
             exit()
 
 

@@ -48,18 +48,17 @@ def main():
                     is_module_section = False
                     break
 
-        if module.name != '':
-            module.print()
-
-
         time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        output_path = 'runs/'
-        output_name = module.name + '-' + time + '.txt'
+        out_path = 'runs/' + module.name + '-' + time + '.txt'
+        log_path = 'logs/' + module.name + '-' + time + '.log'
 
-        f = open(output_path + output_name, 'w')
+        log_file = open(log_path, 'w')
+        module.print(log_file)
+
+        output_file = open(out_path, 'w')
         for pin in module.pins:
             if pin.direction == 'input':
-                f.write(pin.name + ' ')
+                output_file.write(pin.name + ' ')
 
 
 if __name__ == "__main__":
