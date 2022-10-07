@@ -1,6 +1,7 @@
 from class_module import *
 from class_line import *
 from func import *
+import re
 
 
 def read_section_name(line):  # ? delete??
