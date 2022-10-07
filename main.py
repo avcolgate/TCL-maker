@@ -1,5 +1,6 @@
 import os.path
 import sys
+import datetime
 
 from read_func import *
 
@@ -26,6 +27,7 @@ def main():
         is_module_section = False
         
         lines = file.read().split('\n')
+        file.close()
 
         if MANUAL:
             # module name is specified
@@ -78,6 +80,16 @@ def main():
 
         if module.name != '':
             module.print()
+
+
+        time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        output_path = 'runs/'
+        output_name = module.name + '-' + time + '.txt'
+
+        f = open(output_path + output_name, 'w')
+        for pin in module.pins:
+            if pin.direction == 'input':
+                f.write(pin.name + ' ')
 
 
 if __name__ == "__main__":
