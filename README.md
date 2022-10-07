@@ -1,3 +1,3 @@
 # my-verilog-reader
 
-script writes names of input pins in file
+script analyzes pins of top module and writes input pin to file
