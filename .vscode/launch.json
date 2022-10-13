@@ -8,7 +8,7 @@
             "name": "Python: текущий файл",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "verilog-reader/get_inputs.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": ["src/lib_sample.v"]

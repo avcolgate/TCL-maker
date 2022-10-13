@@ -1,5 +1,4 @@
-from class_module import *
-from class_line import *
+from classes import *
 from func import *
 import re
 

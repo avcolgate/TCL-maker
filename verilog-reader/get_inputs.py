@@ -49,6 +49,7 @@ def main():
                     break
 
         time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        time = ''
         out_path = 'runs/' + module.name + '-' + time + '.txt'
         log_path = 'logs/' + module.name + '-' + time + '.log'
 
@@ -59,6 +60,7 @@ def main():
         for pin in module.pins:
             if pin.direction == 'input':
                 output_file.write(pin.name + ' ')
+                print(pin.name + ' ')
 
 
 if __name__ == "__main__":
