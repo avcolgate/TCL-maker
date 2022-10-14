@@ -3,11 +3,11 @@ import os
 from verilog_keywords import keyword_list
 
 def define_init_data(init_data):
-    if len(init_data) < 2:
+    if len(init_data) < 1:
         print('fatal: a path is not specified\n')
         exit()
-    elif os.path.exists(init_data[1]):
-        path = init_data[1].replace('\\', '/')
+    elif os.path.exists(init_data[0]):
+        path = init_data[0].replace('\\', '/')
         if os.stat(path).st_size == 0:
             print('fatal: input file is empty\n')
             exit()
@@ -17,12 +17,12 @@ def define_init_data(init_data):
 
 
     # only path specified
-    if len(init_data) == 2:
+    if len(init_data) == 1:
         specified_name = ''
     
     # manual mode and module name is specified
-    elif len(init_data) == 4 and (init_data[2] == '-m' or init_data[2] == '--manual'):
-        specified_name = init_data[3]
+    elif len(init_data) == 3 and (init_data[1] == '-m' or init_data[1] == '--manual'):
+        specified_name = init_data[2]
         if not is_good_name(specified_name):
             print("fatal: bad specified module name '%s'\n" % (specified_name))
             exit()

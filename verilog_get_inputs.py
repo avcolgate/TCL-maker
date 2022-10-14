@@ -9,6 +9,7 @@ from verilog_read import get_top_module, parse_body
 #* MANUAL PATH -m MODULE_NAME
 
 def get_module_inputs(init_data = []):
+    print('init_data for get_module_inputs(): %s\n' %init_data)
 
     input_arr = []
     path, specified_name = define_init_data(init_data)
@@ -35,7 +36,7 @@ def get_module_inputs(init_data = []):
                 output_file.write(pin.name + ' ')
                 input_arr.append(pin.name)
 
-    return input_arr
+    return module.name, input_arr
 
 
 # if __name__ == "__main__":
