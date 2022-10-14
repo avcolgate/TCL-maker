@@ -4,13 +4,14 @@ from datetime import datetime
 from verilog_func import define_init_data
 from verilog_read import get_top_module, parse_body
 
-#*          0      1    2     3
-#* AUTO:  main.py PATH
-#* MANUAL main.py PATH -m MODULE_NAME
+#*         0    1     2
+#* AUTO:  PATH
+#* MANUAL PATH -m MODULE_NAME
 
-def get_inputs():
+def get_module_inputs(init_data = []):
 
-    path, specified_name = define_init_data(sys.argv)
+    input_arr = []
+    path, specified_name = define_init_data(init_data)
 
     with open(file=path, mode='rt') as file:
         
@@ -32,8 +33,10 @@ def get_inputs():
         for pin in module.pins:
             if pin.direction == 'input':
                 output_file.write(pin.name + ' ')
-                print(pin.name + ' ')
+                input_arr.append(pin.name)
+
+    return input_arr
 
 
-if __name__ == "__main__":
-    get_inputs()
+# if __name__ == "__main__":
+#     get_module_inputs(sys.argv)

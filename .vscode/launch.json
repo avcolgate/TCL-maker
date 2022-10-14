@@ -8,10 +8,10 @@
             "name": "Python: текущий файл",
             "type": "python",
             "request": "launch",
-            "program": "verilog_get_inputs.py",
+            "program": "tcl_builder.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["src/lib_sample.v"]
+            // "args": ["src/lib_sample.v"]
         }
     ]
 }
