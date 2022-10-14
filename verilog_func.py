@@ -1,6 +1,6 @@
 
 import os
-from keywords import keyword_list
+from verilog_keywords import keyword_list
 
 def define_init_data(args):
     if len(args) < 2:

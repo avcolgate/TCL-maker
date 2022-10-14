@@ -1,8 +1,10 @@
-import os.path
 import sys
 import datetime
+from verilog_classes import Line, Module
 
-from read_func import *
+from verilog_func import define_init_data
+from verilog_read import get_top_module, read_section_pins
+
 #*          0      1    2     3
 #* AUTO:  main.py PATH
 #* MANUAL main.py PATH -m MODULE_NAME
@@ -49,7 +51,6 @@ def main():
                     break
 
         time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        time = ''
         out_path = 'runs/' + module.name + '-' + time + '.txt'
         log_path = 'logs/' + module.name + '-' + time + '.log'
 

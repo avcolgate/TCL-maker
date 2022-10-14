@@ -1,17 +1,38 @@
-from classes import *
-from func import *
 import re
 
+from verilog_classes import Line, Module, Module_for_search, Pin
+from verilog_func import is_good_name, skip_comment
 
-def read_section_name(line):  # ? delete??
-    temp = line.content
-    if temp.find('(') != -1:  # '(' exist
-        name = temp[temp.find('module') + len('module') + 1:temp.find('(')]
-    else:  # '(' don't exist
-        name = temp[temp.find('module') + len('module') + 1:]
+def parse_body(temp_module):
+    module_name = temp_module.name
+    module_body_arr = temp_module.text_arr
+    module_offset = temp_module.offset + 1
 
-    return name
+    is_module_section = False
+    module = Module()
 
+    for line_num, curr_line in enumerate(module_body_arr): # TODO сделать отдельную функцию
+        line = Line(curr_line)
+        
+        if not is_module_section and line.is_module_section():
+            # print(line.content)
+            module.append_name(module_name)
+            is_module_section = True
+            continue
+
+        if is_module_section:
+            if line.is_pin_section():
+                # print(line.content)
+                pin_arr = read_section_pins(line, module.pins, line_num + module_offset)
+                for pin in pin_arr:
+                    module.append_pin(pin)
+                continue
+            if line.is_endmodule_section():
+                # print(line.content)
+                is_module_section = False
+                break
+            
+    return module
 
 # * fatals:
 # duplicate name

@@ -1,4 +1,7 @@
-from func import *
+
+
+from verilog_func import skip_comment
+
 
 class Module:
     def __init__(self, name=''):
