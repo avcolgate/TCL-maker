@@ -1,8 +1,9 @@
 import sys
 from datetime import datetime
 
-from verilog_func import define_init_data
-from verilog_read import get_top_module, parse_body
+
+from verilog_reader.parse import get_top_module, parse_body
+from verilog_reader.func import define_init_data
 
 #*         0    1     2
 #* AUTO:  PATH

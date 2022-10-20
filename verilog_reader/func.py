@@ -1,6 +1,6 @@
 
 import os
-from verilog_keywords import keyword_list
+from verilog_reader.keywords import keyword_list
 
 def define_init_data(init_data):
     if len(init_data) < 1:

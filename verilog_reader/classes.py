@@ -1,6 +1,5 @@
 
-
-from verilog_func import skip_comment
+from verilog_reader.func import skip_comment
 
 
 class Module:

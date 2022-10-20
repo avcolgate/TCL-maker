@@ -1,7 +1,7 @@
 import re
 
-from verilog_classes import Line, Module, Module_for_search, Pin
-from verilog_func import is_good_name, skip_comment
+from verilog_reader.classes import Line, Module, Module_for_search, Pin
+from verilog_reader.func import is_good_name, skip_comment
 
 def parse_body(temp_module):
     module_name = temp_module.name
@@ -23,7 +23,7 @@ def parse_body(temp_module):
         if is_module_section:
             if line.is_pin_section():
                 # print(line.content)
-                pin_arr = read_section_pins(line, module.pins, line_num + module_offset)
+                pin_arr = parse_section_pins(line, module.pins, line_num + module_offset)
                 for pin in pin_arr:
                     module.append_pin(pin)
                 continue
@@ -43,7 +43,7 @@ def parse_body(temp_module):
 # float pin size
 # * warnings:
 # equal limits in pin size
-def read_section_pins(line, pin_list, line_num):
+def parse_section_pins(line, pin_list, line_num):
     pin_arr = []
     pin_direction = 'NaN'
     k = 1
@@ -115,6 +115,8 @@ def get_top_module(lines, specified_name = ''):
     # collecting module names and it's content
     module_fs = Module_for_search() #TODO можно без создания объекта?
     temp_name = ''
+    temp_line = ''
+    start_line = 0
     is_module_section = False
 
     # collecting bodies of each module
