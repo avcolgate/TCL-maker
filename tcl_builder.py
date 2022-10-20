@@ -23,8 +23,8 @@ str_clocks = ' '.join(clocks_arr)
 str_ports = ' '.join(ports_arr)
 
 
-for i in range(len(transitions)):
-    output_tcl = open('tcl/transition%i_%f.tcl' % (i, transitions[i]), 'w')
+for num, tran in enumerate(transitions):
+    output_tcl = open('tcl/transition%i_%f.tcl' % (num, tran), 'w')
 
     output_tcl.write('read_liberty %s\n' % lib_path)
     output_tcl.write('read_verilog %s\n' % netlist_path)
@@ -36,7 +36,7 @@ for i in range(len(transitions)):
 
     output_tcl.write('set_clock_transition %f [get_clocks {%s}]\n' % (clock_transition, str_clocks))
 
-    output_tcl.write('set_input_transition %f [get_ports {%s}]\n\n' % (transitions[i], str_ports))
+    output_tcl.write('set_input_transition %f [get_ports {%s}]\n\n' % (tran, str_ports))
 
     output_tcl.write('write_timing_model %s\n' % 'PATH')
     output_tcl.write('exit')
