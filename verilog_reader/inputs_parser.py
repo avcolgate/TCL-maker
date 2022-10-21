@@ -25,7 +25,7 @@ def get_module_inputs(init_data = []):
         module = parse_body(temp_module)
 
         time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        out_path = 'runs/' + module.name + '-' + time + '.txt'
+        out_path = 'runs/verilog/' + module.name + '-' + time + '.txt'
         log_path = 'logs/' + module.name + '-' + time + '.log'
 
         log_file = open(log_path, 'w')
